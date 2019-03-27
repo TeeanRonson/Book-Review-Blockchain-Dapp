@@ -102,6 +102,8 @@ func(peers *PeerList) Rebalance() {
 			newPeerMap[key] = value
 		}
 	}
+	//checksize
+	fmt.Println("Length", len(newPeerMap))
 }
 
 /**
