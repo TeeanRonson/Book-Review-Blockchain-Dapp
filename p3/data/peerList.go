@@ -3,6 +3,7 @@ package data
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"sort"
 	"strings"
@@ -16,32 +17,107 @@ type PeerList struct {
 	mux sync.Mutex
 }
 
-func NewPeerList(id int32, maxLength int32) PeerList {}
+type SinglePeer struct {
+	peerId int32
+	peerAdd string
+}
 
-func(peers *PeerList) Add(addr string, id int32) {}
+func NewPeerList(id int32, maxLength int32) PeerList {
 
-func(peers *PeerList) Delete(addr string) {}
+	peerMap := make(map[string]int32)
+	return PeerList{id, peerMap, maxLength, sync.Mutex{}}
 
-func(peers *PeerList) Rebalance() {}
+}
 
-func(peers *PeerList) Show() string {}
+func(peers *PeerList) Add(addr string, id int32) {
 
+	peers.peerMap[addr] = id
+	peers.maxLength++
+}
+
+func(peers *PeerList) Delete(addr string) {
+
+	delete(peers.peerMap, addr)
+}
+
+/**
+Before sending HeartBeat, Rebalance the PeerList
+by choosing 32 closest peers
+1. Sort Map by Id
+2. Insert selfId
+3. Choose 16 nodes at each side of selfId
+ */
+func(peers *PeerList) Rebalance() {
+
+
+
+}
+
+/**
+Show the peer list is a string
+ */
+func(peers *PeerList) Show() string {
+
+	var result string
+	for _, value := range peers.peerMap {
+		result += string(value) + " "
+	}
+	return result
+}
+
+/**
+Register?
+ */
 func(peers *PeerList) Register(id int32) {
 	peers.selfId = id
 	fmt.Printf("SelfId=%v\n", id)
 }
 
+/**
+
+ */
 func(peers *PeerList) Copy() map[string]int32 {}
 
+/**
+
+ */
 func(peers *PeerList) GetSelfId() int32 {
 	return peers.selfId
 }
 
-func(peers *PeerList) PeerMapToJson() (string, error) {}
+/**
+Convert the PeerMap to Json format
+ */
+func(peers *PeerList) PeerMapToJson() (string, error) {
 
-func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, selfAddr string) {}
+	peerList := make([]SinglePeer, 0)
+
+	for key, value := range peers.peerMap {
+		peerList = append(peerList, SinglePeer{value, key})
+	}
+
+	result, err := json.MarshalIndent(peerList, "", "")
+	if err != nil {
+		fmt.Println("Cannot Marshal Indent jsonList")
+		log.Fatal(err)
+	}
+
+	return string(result), nil
+}
+
+/**
+Inject NewPeerMap to existing PeerMap
+ */
+func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, selfAddr string) {
+
+
+
+
+
+}
 
 func TestPeerListRebalance() {
+	//test1
 	peers := NewPeerList(5, 4)
 	peers.Add("1111", 1)
 	peers.Add("4444", 4)

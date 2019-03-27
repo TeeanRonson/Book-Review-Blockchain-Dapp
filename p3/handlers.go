@@ -31,10 +31,21 @@ func init() {
 	// Do some initialization here.
 }
 
-// Register ID, download BlockChain, start HeartBeat
-func Start(w http.ResponseWriter, r *http.Request) {}
+/**
+Register ID, download BlockChain, start HeartBeat
+You can start the program by calling this route(be careful to start only once),
+or start the program during bootstrap.
+ */
+func Start(w http.ResponseWriter, r *http.Request) {
 
-// Display peerList and sbc
+}
+
+/**
+GET
+Display peerList and sbc
+Display the PeerList and the BlockChain. Use the helper function
+BlockChain.show() in the starter code to display the BlockChain, and add your own function to display the PeerList.
+ */
 func Show(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s\n%s", Peers.Show(), SBC.Show())
 }
@@ -45,7 +56,13 @@ func Register() {}
 // Download blockchain from TA server
 func Download() {}
 
-// Upload blockchain to whoever called this method, return jsonStr
+/**
+/upload
+Method: GET
+Response: The JSON string of the BlockChain.
+Description: Return JSON string of the entire blockchain to the downloader.
+Upload blockchain to whoever called this method, return jsonStr
+ */
 func Upload(w http.ResponseWriter, r *http.Request) {
 	blockChainJson, err := SBC.BlockChainToJson()
 	if err != nil {
@@ -54,10 +71,23 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, blockChainJson)
 }
 
-// Upload a block to whoever called this method, return jsonStr
+/**
+/block/{height}/{hash}
+Method: GET
+Response: If you have the block, return the JSON string of the specific block;
+if you don't have the block, return HTTP 204: StatusNoContent;
+if there's an error, return HTTP 500: InternalServerError.
+Description: Return JSON string of a specific block to the downloader.
+Upload a block to whoever called this method, return jsonStr
+ */
 func UploadBlock(w http.ResponseWriter, r *http.Request) {}
 
-// Received a heartbeat
+/**
+/heartbeat/receive
+Method: POST
+Request: HeartBeatData(see the data structure below)
+Description: Receive a heartbeat.
+ */
 func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {}
 
 // Ask another server to return a block of certain height and hash

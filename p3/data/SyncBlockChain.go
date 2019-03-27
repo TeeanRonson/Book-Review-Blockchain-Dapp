@@ -29,7 +29,9 @@ func(sbc *SyncBlockChain) Insert(block p2.Block) {
 	sbc.mux.Unlock()
 }
 
-func(sbc *SyncBlockChain) CheckParentHash(insertBlock p2.Block) bool {}
+func(sbc *SyncBlockChain) CheckParentHash(insertBlock p2.Block) bool {
+
+}
 
 func(sbc *SyncBlockChain) UpdateEntireBlockChain(blockChainJson string) {}
 
