@@ -1,8 +1,8 @@
 package data
 
 import (
-	"../../p1"
-	"../../p2"
+	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
+	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
 	"sync"
 )
 
@@ -15,13 +15,16 @@ func NewBlockChain() SyncBlockChain {
 	return SyncBlockChain{bc: p2.NewBlockChain()}
 }
 
-func(sbc *SyncBlockChain) Get(height int32) ([]p2.Block, bool) {
-	sbc.mux.Lock()
-	defer sbc.mux.Unlock()
-	return sbc.bc.Get(height)
-}
+//func(sbc *SyncBlockChain) Get(height int32) ([]p2.Block, bool) {
+//	sbc.mux.Lock()
+//	defer sbc.mux.Unlock()
+//	//return sbc.bc.Get(height)
+//}
 
-func(sbc *SyncBlockChain) GetBlock(height int32, hash string) (p2.Block, bool) {}
+func(sbc *SyncBlockChain) GetBlock(height int32, hash string) (p2.Block, bool) {
+
+
+}
 
 func(sbc *SyncBlockChain) Insert(block p2.Block) {
 	sbc.mux.Lock()

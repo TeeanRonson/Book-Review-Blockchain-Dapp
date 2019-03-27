@@ -1,12 +1,34 @@
 package data
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type RegisterData struct {
 	AssignedId int32 `json:"assignedId"`
 	PeerMapJson string `json:"peerMapJson"`
 }
 
-func NewRegisterData(id int32, peerMapJson string) RegisterData {}
+/**
+Return a New Register Data struct
+ */
+func NewRegisterData(id int32, peerMapJson string) RegisterData {
 
-func (data *RegisterData) EncodeToJson() (string, error) {}
+	return RegisterData{id, peerMapJson}
+}
+
+/**
+Encode the Register data into Json Format
+ */
+func (data *RegisterData) EncodeToJson() (string, error) {
+
+	jsonFormatted, err := json.MarshalIndent(data, "", "")
+
+	if err != nil {
+		fmt.Println("Error in EncodeToJson")
+		return "", err
+	}
+
+	return string(jsonFormatted), nil
+}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"sort"
 	"strings"
 	"sync"
 )
@@ -29,12 +28,18 @@ func NewPeerList(id int32, maxLength int32) PeerList {
 
 }
 
+/**
+Add a new address and id to the peer list
+ */
 func(peers *PeerList) Add(addr string, id int32) {
 
 	peers.peerMap[addr] = id
 	peers.maxLength++
 }
 
+/**
+Delete a peer from the PeerMap
+ */
 func(peers *PeerList) Delete(addr string) {
 
 	delete(peers.peerMap, addr)
@@ -42,15 +47,61 @@ func(peers *PeerList) Delete(addr string) {
 
 /**
 Before sending HeartBeat, Rebalance the PeerList
-by choosing 32 closest peers
+by choosing 32 closest peers - 16 below and 16 above
 1. Sort Map by Id
 2. Insert selfId
 3. Choose 16 nodes at each side of selfId
  */
 func(peers *PeerList) Rebalance() {
 
+	//Get the sorted PairList
+	index := 0
+	added := false
+	peerListId := RebalanceHelper(peers.peerMap)
+	tempList := make([]int32, 0)
+	newPeerMap := make(map[string]int32, 0)
 
+	//Add self to list
+	for i, entry := range peerListId {
+		if added == false && peers.selfId < entry.Value {
+			tempList = append(tempList, peers.selfId)
+			added = true
+			index = i
+		} else {
+			tempList = append(tempList, entry.Value)
+		}
+	}
 
+	//Get the closest top 16 peers
+	j := 0
+	topStart := index
+	newPeersId := make(map[int32]bool, 0)
+	for j < 16 {
+		nextPeer := tempList[topStart % len(peers.peerMap)]
+		newPeersId[nextPeer] = true
+		topStart++
+		j++
+	}
+
+	//Get the closes lower 16 peers
+	k := 0
+	botStart := index
+	for k < 16 {
+		nextPeer := tempList[botStart]
+		newPeersId[nextPeer] = true
+		botStart--
+		k++
+		if botStart < 0 {
+			botStart += len(peers.peerMap)
+		}
+	}
+
+	//create the new peer map
+	for key, value := range peers.peerMap {
+		if newPeersId[value] == true {
+			newPeerMap[key] = value
+		}
+	}
 }
 
 /**
