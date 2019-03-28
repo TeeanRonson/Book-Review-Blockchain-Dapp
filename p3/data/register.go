@@ -14,7 +14,6 @@ type RegisterData struct {
 Return a New Register Data struct
  */
 func NewRegisterData(id int32, peerMapJson string) RegisterData {
-
 	return RegisterData{id, peerMapJson}
 }
 
@@ -29,6 +28,5 @@ func (data *RegisterData) EncodeToJson() (string, error) {
 		fmt.Println("Error in EncodeToJson")
 		return "", err
 	}
-
 	return string(jsonFormatted), nil
 }

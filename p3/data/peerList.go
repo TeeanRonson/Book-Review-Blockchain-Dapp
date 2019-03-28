@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
-	"strings"
 	"sync"
 )
 
@@ -17,31 +15,34 @@ type PeerList struct {
 }
 
 type SinglePeer struct {
-	peerId int32
 	peerAdd string
+	peerId int32
+
 }
 
+/**
+Create New Peer list
+ */
 func NewPeerList(id int32, maxLength int32) PeerList {
-
 	peerMap := make(map[string]int32)
 	return PeerList{id, peerMap, maxLength, sync.Mutex{}}
-
 }
 
 /**
 Add a new address and id to the peer list
  */
 func(peers *PeerList) Add(addr string, id int32) {
-
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	peers.peerMap[addr] = id
-	peers.maxLength++
 }
 
 /**
 Delete a peer from the PeerMap
  */
 func(peers *PeerList) Delete(addr string) {
-
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	delete(peers.peerMap, addr)
 }
 
@@ -53,8 +54,13 @@ by choosing 32 closest peers - 16 below and 16 above
 3. Choose 16 nodes at each side of selfId
  */
 func(peers *PeerList) Rebalance() {
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 
-	//Get the sorted PairList
+	//if len(peers.peerMap) <= 32 {
+	//	return
+	//}
+
 	index := 0
 	added := false
 	peerListId := RebalanceHelper(peers.peerMap)
@@ -65,6 +71,7 @@ func(peers *PeerList) Rebalance() {
 	for i, entry := range peerListId {
 		if added == false && peers.selfId < entry.Value {
 			tempList = append(tempList, peers.selfId)
+			tempList = append(tempList, entry.Value)
 			added = true
 			index = i
 		} else {
@@ -73,26 +80,28 @@ func(peers *PeerList) Rebalance() {
 	}
 
 	//Get the closest top 16 peers
-	j := 0
-	topStart := index
+	var j int32
+	j = 0
+	topStart := index + 1
 	newPeersId := make(map[int32]bool, 0)
-	for j < 16 {
-		nextPeer := tempList[topStart % len(peers.peerMap)]
+	for j < peers.maxLength/2 {
+		nextPeer := tempList[topStart % len(tempList)]
 		newPeersId[nextPeer] = true
 		topStart++
 		j++
 	}
+	//Get the closest lower 16 peers
+	var k int32
+	k = 0
 
-	//Get the closes lower 16 peers
-	k := 0
-	botStart := index
-	for k < 16 {
+	botStart := index - 1
+	for k < peers.maxLength/2 {
 		nextPeer := tempList[botStart]
 		newPeersId[nextPeer] = true
 		botStart--
 		k++
 		if botStart < 0 {
-			botStart += len(peers.peerMap)
+			botStart += len(tempList)
 		}
 	}
 
@@ -102,39 +111,48 @@ func(peers *PeerList) Rebalance() {
 			newPeerMap[key] = value
 		}
 	}
-	//checksize
-	fmt.Println("Length", len(newPeerMap))
+	peers.peerMap = newPeerMap
 }
 
 /**
-Show the peer list is a string
+Show() shows all addresses and their corresponding IDs.
+For example, it returns "This is PeerMap: \n addr=127.0.0.1, id=1".
  */
 func(peers *PeerList) Show() string {
-
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	var result string
-	for _, value := range peers.peerMap {
-		result += string(value) + " "
+	for key, entry := range peers.peerMap {
+		result += "Address = " + key + " Id = " + string(entry) + "\n"
 	}
 	return result
 }
 
 /**
-Register?
+Register an Id for self
  */
 func(peers *PeerList) Register(id int32) {
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	peers.selfId = id
 	fmt.Printf("SelfId=%v\n", id)
 }
 
 /**
-
+Get a copy of self Peer Map
  */
-func(peers *PeerList) Copy() map[string]int32 {}
+func(peers *PeerList) Copy() map[string]int32 {
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
+	return peers.peerMap
+}
 
 /**
-
+Get self Id
  */
 func(peers *PeerList) GetSelfId() int32 {
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	return peers.selfId
 }
 
@@ -143,10 +161,12 @@ Convert the PeerMap to Json format
  */
 func(peers *PeerList) PeerMapToJson() (string, error) {
 
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
 	peerList := make([]SinglePeer, 0)
 
 	for key, value := range peers.peerMap {
-		peerList = append(peerList, SinglePeer{value, key})
+		peerList = append(peerList, SinglePeer{key, value})
 	}
 
 	result, err := json.MarshalIndent(peerList, "", "")
@@ -163,51 +183,20 @@ Inject NewPeerMap to existing PeerMap
  */
 func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, selfAddr string) {
 
+	peers.mux.Lock()
+	defer peers.mux.Unlock()
+	newPeersList := make([]SinglePeer, 0)
+	peers.peerMap[selfAddr] = peers.selfId
 
-
-
-
-}
-
-func TestPeerListRebalance() {
-	//test1
-	peers := NewPeerList(5, 4)
-	peers.Add("1111", 1)
-	peers.Add("4444", 4)
-	peers.Add("-1-1", -1)
-	peers.Add("0000", 0)
-	peers.Add("2121", 21)
-	peers.Rebalance()
-	expected := NewPeerList(5, 4)
-	expected.Add("1111", 1)
-	expected.Add("4444", 4)
-	expected.Add("2121", 21)
-	expected.Add("-1-1", -1)
-	fmt.Println(reflect.DeepEqual(peers, expected))
-
-	peers = NewPeerList(5, 2)
-	peers.Add("1111", 1)
-	peers.Add("4444", 4)
-	peers.Add("-1-1", -1)
-	peers.Add("0000", 0)
-	peers.Add("2121", 21)
-	peers.Rebalance()
-	expected = NewPeerList(5, 2)
-	expected.Add("4444", 4)
-	expected.Add("2121", 21)
-	fmt.Println(reflect.DeepEqual(peers, expected))
-
-	peers = NewPeerList(5, 4)
-	peers.Add("1111", 1)
-	peers.Add("7777", 7)
-	peers.Add("9999", 9)
-	peers.Add("11111111", 11)
-	peers.Add("2020", 20)
-	peers.Rebalance()
-	expected = NewPeerList(5, 4)
-	expected.Add("1111", 1)
-	expected.Add("7777", 7)
-	expected.Add("9999", 9)
-	expected.Add("2020", 20)
-	fmt.Println(reflect.DeepEqual(peers, expected))
+	if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
+		fmt.Println("Error in InjectPeerMapJson")
+		panic(err)
+		return
+	}
+	//add everything except yours
+	for _, item := range newPeersList {
+		if item.peerId != peers.selfId {
+			peers.peerMap[item.peerAdd] = item.peerId
+		}
+	}
 }

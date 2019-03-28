@@ -4,7 +4,7 @@ import (
     "encoding/hex"
     "encoding/json"
     "fmt"
-    "github.com/teeanronson/cs686_blockchain_P1_Go_skeleton/p1"
+    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
     "golang.org/x/crypto/sha3"
     "time"
 )

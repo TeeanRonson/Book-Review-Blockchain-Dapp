@@ -1,8 +1,6 @@
 package data
 
-import (
-    "sort"
-)
+import "sort"
 
 // A data structure to hold key/value pairs
 //type Pair struct {
@@ -31,19 +29,19 @@ func RebalanceHelper(peerList map[string]int32) PeerListId {
         list[i] = PeerId{value}
         i++
     }
-
-    //fmt.Printf("Pre-sorted: ")
-    //for _, k := range p {
-    //    fmt.Printf("%s ", k.Key)
-    //}
-    //fmt.Println("")
     sort.Sort(list)
-
-    //fmt.Printf("Post-sorted: ")
-    //for _, k := range pairs {
-    //    fmt.Printf("%s ", k.Key)
-    //}
-    //fmt.Println("")
     return list
-
 }
+
+//fmt.Printf("Pre-sorted: ")
+//for _, k := range p {
+//    fmt.Printf("%s ", k.Key)
+//}
+//fmt.Println("")
+
+
+//fmt.Printf("Post-sorted: ")
+//for _, k := range pairs {
+//    fmt.Printf("%s ", k.Key)
+//}
+//fmt.Println("")

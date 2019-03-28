@@ -1,8 +1,5 @@
 package main
 
-import (
-	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
-)
 func main() {
 
 	//router := p3.NewRouter()
@@ -12,8 +9,6 @@ func main() {
 	//	log.Fatal(http.ListenAndServe(":6686", router))
 	//}
 
-
-	data.RebalanceHelper()
 
 	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 	//	fmt.Fprintf(w, "Hello, Sir Liew %q", html.EscapeString(r.URL.Path))
