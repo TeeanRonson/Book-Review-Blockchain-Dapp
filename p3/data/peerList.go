@@ -35,6 +35,7 @@ func(peers *PeerList) Add(addr string, id int32) {
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
 	peers.peerMap[addr] = id
+	fmt.Println("After adding:", peers.peerMap)
 }
 
 /**
@@ -143,6 +144,7 @@ Get a copy of self Peer Map
 func(peers *PeerList) Copy() map[string]int32 {
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
+	fmt.Println("------------PeerMap", peers.peerMap)
 	return peers.peerMap
 }
 
@@ -162,18 +164,12 @@ func(peers *PeerList) PeerMapToJson() (string, error) {
 
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
-	peerList := make([]SinglePeer, 0)
 
-	for key, value := range peers.peerMap {
-		peerList = append(peerList, SinglePeer{key, value})
-	}
-
-	result, err := json.MarshalIndent(peerList, "", "")
+	result, err := json.MarshalIndent(peers.peerMap, "", "")
 	if err != nil {
 		fmt.Println("Cannot Marshal Indent jsonList")
 		log.Fatal(err)
 	}
-
 	return string(result), nil
 }
 
@@ -185,17 +181,23 @@ func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, senderAddr string
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
 	newPeersList := make([]SinglePeer, 0)
+	fmt.Println("ADDRESS:", senderAddr)
+	fmt.Println("ID:", senderId)
+	fmt.Println("PeerMap:", peerMapJsonStr)
 	peers.peerMap[senderAddr] = senderId
 
-	if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
-		fmt.Println("Error in InjectPeerMapJson")
-		panic(err)
-		return
-	}
-	//add everything except yours
-	for _, item := range newPeersList {
-		if item.peerId != peers.selfId {
-			peers.peerMap[item.peerAdd] = item.peerId
-		}
-	}
+
+
+	//if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
+	//	fmt.Println("Error in InjectPeerMapJson")
+	//	panic(err)
+	//	return
+	//}
+	////add everything except yours
+	//fmt.Println("These are the peers we have received:", newPeersList)
+	//for _, item := range newPeersList {
+	//	if item.peerId != peers.selfId {
+	//		peers.peerMap[item.peerAdd] = item.peerId
+	//	}
+	//}
 }

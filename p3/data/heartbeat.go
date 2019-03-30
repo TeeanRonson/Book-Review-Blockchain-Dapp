@@ -38,11 +38,13 @@ func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString s
 		block := sbc.GenBlock(mpt)
 		blockJson, err := block.EncodeToJson()
 		if err != nil {
-			fmt.Println("Error in Prepare Heart Beat Data")
+			fmt.Println("Error in PrepareHeartBeatData")
 			panic(err)
 		}
+		fmt.Println("We created a block!")
 		return HeartBeatData{true, selfId, blockJson, peerMapJsonString, addr, 3}
 	} else { //don't create a new block
+		fmt.Println("We are not creating a block!")
 		return HeartBeatData{false, selfId, "", peerMapJsonString, addr, 3}
 	}
 }

@@ -58,6 +58,7 @@ func (bc *BlockChain) Insert(block Block) {
 		//add a new chain at the height
 		fmt.Println("block header height", block.Header.Height)
 		bc.Chain[block.Header.Height] = newChain
+
 	} else {
 		for _, currBlock := range currChain {
 			if reflect.DeepEqual(block.Header.Hash, currBlock.Header.Hash) {

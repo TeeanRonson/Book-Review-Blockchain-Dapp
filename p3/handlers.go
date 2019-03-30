@@ -17,9 +17,11 @@ import (
 var TA_SERVER = "http://localhost:6688"
 var REGISTER_SERVER = TA_SERVER + "/peer"
 var BC_DOWNLOAD_SERVER = TA_SERVER + "/upload"
-var LOCAL_HOST = "http://localhost:"
+var LOCAL_HOST = "localhost:"
 var FIRST_NODE = "http://localhost:6686"
 var GET_BC_FIRST_NODE = FIRST_NODE + "/upload"
+var HTTP = "http://"
+var HTTPLOCALHOST = HTTP + LOCAL_HOST
 
 var SBC data.SyncBlockChain
 var Peers data.PeerList
@@ -53,9 +55,8 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Printing the block", block)
 	} else {
 		Download()
-		ifStarted = true
 	}
-	//Peers.Register(convertToInt32(os.Args[0]))
+	ifStarted = true
 	go StartHeartBeat()
 }
 
@@ -91,21 +92,15 @@ You may not need it after node starts heartBeats.
  */
 func Download() {
 
-	//Get the block chain from first node
-	resp, err := http.Get(GET_BC_FIRST_NODE)
+	resp, _ := http.Get(GET_BC_FIRST_NODE + "?id=" + os.Args[1])
 
-	if err != nil {
-		fmt.Println("Error in Download Handler")
-		panic(err)
-	}
 
-	//decoder := json.NewDecoder(resp.Body)
 	currBlockChain, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Can't read response body")
 		log.Fatal(err)
 	}
-	fmt.Println("The block chain we downloaded:", currBlockChain)
+	fmt.Println("The block chain we downloaded:", string(currBlockChain))
 	SBC.UpdateEntireBlockChain(string(currBlockChain))
 }
 
@@ -129,12 +124,11 @@ Description: Return JSON string of the entire blockchain to the downloader.
 Return the BlockChain's JSON. And add the remote peer into the PeerMap.
  */
 func Upload(w http.ResponseWriter, r *http.Request) {
-	//senderAdd := r.RemoteAddr
-	//senderId := r.URL.Query()["id"][0]
+	//senderAdd := r.Host
 
+	senderId := r.URL.Query()["id"][0]
 	//Add remote peer into PeerMap
-	//TODO: Do we need to do this?
-	//Peers.Add(senderAdd, convertToInt32(senderId))
+	Peers.Add(senderId, convertToInt32(senderId))
 
 	//Return the BlockChain's JSON
 	blockChainJson, err := SBC.BlockChainToJson()
@@ -161,8 +155,8 @@ func UploadBlock(w http.ResponseWriter, r *http.Request) {
 	height := path[1]
 	targetHash := path[2]
 	blocksAtHeight := SBC.Get(convertToInt32(height))
-	var theBlock p2.Block
 
+	var theBlock p2.Block
 	if path[0] != "block" || len(path) != 3 || path == nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
@@ -199,29 +193,28 @@ If so, do these:
 func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 
 	//ifStarted wait till we finish downloading BC
-
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	//Convert Json into HeartBeatData
 	hbd := decodeJsonToHbd(string(b))
+	fmt.Println("Received HEARTBEAT:", hbd)
 	//Add sender PeerMap and sender into PeerMap
 	Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
 	//if HeartBeatData has a new block
 	if hbd.IfNewBlock {
 		//Get the new block
 		recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
-		if SBC.CheckParentHash(recvBlock) {
-			SBC.Insert(recvBlock)
-		} else {
+		fmt.Println("Through:", recvBlock)
+		if !SBC.CheckParentHash(recvBlock) {
 			//Asks for the parent block and inserts the parent block
 			AskForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
-			SBC.Insert(recvBlock)
 		}
+		SBC.Insert(recvBlock)
+		fmt.Println("Inserted successfully")
 		hbd.Hops = hbd.Hops - 1
 		if hbd.Hops > 0 {
 			ForwardHeartBeat(hbd)
@@ -235,8 +228,9 @@ add the block to the block chain
  */
 func AskForBlock(height int32, hash string) {
 
-	for add, _ := range Peers.Copy() {
-		endPoint := "LOCAL_HOST" + add + "/block/" + string(height) + "/"+ hash
+	for addr, _ := range Peers.Copy() {
+		endPoint := HTTPLOCALHOST + addr + "/block/" + string(height) + "/"+ hash
+		fmt.Println("EndPoint in AskforBlock:", endPoint)
 		resp, err := http.Get(endPoint)
 		if err != nil {
 			fmt.Println("AskForBlock Error")
@@ -264,12 +258,18 @@ Send the HeartBeatData to all peers in local PeerMap.
  */
 func ForwardHeartBeat(heartBeatData data.HeartBeatData) {
 
-	jsonFormatted, err := json.Marshal(heartBeatData)
+	if !heartBeatData.IfNewBlock {
+		return
+	}
+
+	jsonFormatted, err := json.MarshalIndent(heartBeatData, "", "")
 	if err != nil {
 		fmt.Println("Error in ForwardHeartBeatData")
 	}
 	for addr, _ := range Peers.Copy() {
-		recipient := addr + "/heartbeat/receive"
+		recipient := HTTPLOCALHOST + addr + "/heartbeat/receive"
+		fmt.Println("The recipient is:", recipient)
+		fmt.Println("The contents are:", string(jsonFormatted))
 		//send HeartBeatData to all peers in the local PeerMap
 		_, err := http.Post(recipient, "application/json; charset=UTF-8", strings.NewReader(string(jsonFormatted)))
 		if err != nil {
@@ -287,9 +287,10 @@ and send it to all peers in the local PeerMap.
 func StartHeartBeat() {
 
 	for {
-		time.Sleep(8 * time.Second)
+		time.Sleep(3 * time.Second)
+		fmt.Println("HeartBeat", os.Args[1])
 		peerMapAsJson, _ := Peers.PeerMapToJson()
-		selfAdd := LOCAL_HOST + os.Args[1]
+		selfAdd := os.Args[1]
 		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), peerMapAsJson, selfAdd)
 		ForwardHeartBeat(hbd)
 	}

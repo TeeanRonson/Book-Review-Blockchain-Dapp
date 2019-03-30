@@ -84,7 +84,7 @@ func(sbc *SyncBlockChain) UpdateEntireBlockChain(blockChainJson string) {
 	defer sbc.mux.Unlock()
 	newBlockChain, err := p2.BlockChainDecodeFromJson(blockChainJson)
 	if err != nil {
-		fmt.Println("Can't Update Entire BlockChain")
+		fmt.Println("UpdateEntireBlockChain error")
 		panic(err)
 	}
 	sbc.bc = newBlockChain
@@ -115,7 +115,7 @@ func(sbc *SyncBlockChain) GenBlock(mpt p1.MerklePatriciaTrie) p2.Block {
 
 	//generate a new block by passing in (height + 1, the parentHash, mpt)
 	height := sbc.bc.Length + 1
-	parentHash := sbc.bc.Chain[height][0].Header.ParentHash
+	parentHash := sbc.bc.Chain[sbc.bc.Length][0].Header.Hash
 	newBlock.NewBlock(height, parentHash, mpt)
 	return newBlock
 }
