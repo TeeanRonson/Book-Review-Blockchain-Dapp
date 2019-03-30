@@ -124,18 +124,20 @@ Return the BlockChain's JSON. And add the remote peer into the PeerMap.
 func Upload(w http.ResponseWriter, r *http.Request) {
 	//senderAdd := r.Host
 
-	senderId := r.URL.Query()["id"][0]
-	//Add remote peer into PeerMap
-	Peers.Add(senderId, convertToInt32(senderId))
+	if ifStarted {
+		senderId := r.URL.Query()["id"][0]
+		//Add remote peer into PeerMap
+		Peers.Add(senderId, convertToInt32(senderId))
 
-	//Return the BlockChain's JSON
-	blockChainJson, err := SBC.BlockChainToJson()
-	if err != nil {
-		fmt.Println("Upload Endpoint error")
-		panic(err)
+		//Return the BlockChain's JSON
+		blockChainJson, err := SBC.BlockChainToJson()
+		if err != nil {
+			fmt.Println("Upload Endpoint error")
+			panic(err)
+		}
+		//TODO: Do we have to return the id of this sender to the request client?
+		fmt.Fprint(w, blockChainJson)
 	}
-	//TODO: Do we have to return the id of this sender to the request client?
-	fmt.Fprint(w, blockChainJson)
 }
 
 /**
@@ -148,32 +150,34 @@ Description: Return JSON string of a specific block to the downloader.
  */
 func UploadBlock(w http.ResponseWriter, r *http.Request) {
 
-	path := strings.Split(r.URL.Path, "/")
-	fmt.Println("Upload block path:", path)
-	height := path[1]
-	targetHash := path[2]
-	blocksAtHeight := SBC.Get(convertToInt32(height))
+	if ifStarted {
+		path := strings.Split(r.URL.Path, "/")
+		fmt.Println("Upload block path:", path)
+		height := path[1]
+		targetHash := path[2]
+		blocksAtHeight := SBC.Get(convertToInt32(height))
 
-	var theBlock p2.Block
-	if path[0] != "block" || len(path) != 3 || path == nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	}
-
-	for _, entry := range blocksAtHeight {
-		if reflect.DeepEqual(entry.Header.Hash, targetHash) {
-			theBlock = entry
+		var theBlock p2.Block
+		if path[0] != "block" || len(path) != 3 || path == nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
-	}
 
-	if theBlock.Header.Size == 0 {
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-	} else {
-		theBlockJson, err := theBlock.EncodeToJson()
-		if err != nil {
-			fmt.Println("UploadBlock error")
-			panic(err)
+		for _, entry := range blocksAtHeight {
+			if reflect.DeepEqual(entry.Header.Hash, targetHash) {
+				theBlock = entry
+			}
 		}
-		fmt.Fprint(w, theBlockJson)
+
+		if theBlock.Header.Size == 0 {
+			http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+		} else {
+			theBlockJson, err := theBlock.EncodeToJson()
+			if err != nil {
+				fmt.Println("UploadBlock error")
+				panic(err)
+			}
+			fmt.Fprint(w, theBlockJson)
+		}
 	}
 }
 
@@ -191,34 +195,37 @@ If so, do these:
 func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 
 	//ifStarted wait till we finish downloading BC
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	//Convert Json into HeartBeatData
-	hbd := decodeJsonToHbdMod(string(body))
-	fmt.Println("Received HEARTBEAT:", hbd)
-	//Add sender PeerMap and sender into PeerMap
-	Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
-	//if HeartBeatData has a new block
-	if hbd.IfNewBlock {
-		//Get the new block
-		recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
-		fmt.Println("The received block:", recvBlock)
-		if !SBC.CheckParentHash(recvBlock) {
-			//Asks for the parent block and inserts the parent block
-			AskForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
+	if ifStarted {
+		body, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
 		}
-		SBC.Insert(recvBlock)
-		fmt.Println("Inserted successfully")
-		hbd.Hops = hbd.Hops - 1
-		hbd.Addr = os.Args[1]
-		hbd.Id = convertToInt32(os.Args[1])
-		if hbd.Hops > 0 {
-			ForwardHeartBeat(hbd)
+
+		//Convert Json into HeartBeatData
+		hbd := decodeJsonToHbdMod(string(body))
+		fmt.Println("Received HEARTBEAT:", hbd)
+		//Add sender PeerMap and sender into PeerMap
+		Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
+		//if HeartBeatData has a new block
+		if hbd.IfNewBlock {
+			//Get the new block
+			recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
+			fmt.Println("The received block:", recvBlock)
+			if !SBC.CheckParentHash(recvBlock) {
+				//Asks for the parent block and inserts the parent block
+				fmt.Println("ASKING FOR A BLOCK!!!! -----------------------")
+				askForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
+			}
+			SBC.Insert(recvBlock)
+			fmt.Println("Inserted successfully")
+			hbd.Hops = hbd.Hops - 1
+			hbd.Addr = os.Args[1]
+			hbd.Id = convertToInt32(os.Args[1])
+			if hbd.Hops > 0 {
+				ForwardHeartBeat(hbd)
+			}
 		}
 	}
 }
@@ -227,7 +234,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 Loop through all peers in local PeerMap to download a block. As soon as one peer returns the block, stop the loop.
 add the block to the block chain
  */
-func AskForBlock(height int32, hash string) {
+func askForBlock(height int32, hash string) {
 
 	for addr, _ := range Peers.Copy() {
 		endPoint := HTTPLOCALHOST + addr + "/block/" + string(height) + "/"+ hash

@@ -66,9 +66,9 @@ func (bc *BlockChain) Insert(block Block) {
 			}
 		}
 		bc.Chain[block.Header.Height] = append(bc.Chain[block.Header.Height], block)
-		if bc.Length < block.Header.Height {
-			bc.Length = block.Header.Height
-		}
+	}
+	if bc.Length < block.Header.Height {
+		bc.Length = block.Header.Height
 	}
 }
 

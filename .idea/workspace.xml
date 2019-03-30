@@ -2,12 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ca844d71-1241-42e5-86b7-de0a5d41c8a4" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/main2.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/p2/Converting_helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/p2/Converting_helpers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/p3/data/heartbeat.go" beforeDir="false" afterPath="$PROJECT_DIR$/p3/data/heartbeat.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/p2/BlockChain.go" beforeDir="false" afterPath="$PROJECT_DIR$/p2/BlockChain.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/p3/data/peerList.go" beforeDir="false" afterPath="$PROJECT_DIR$/p3/data/peerList.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/p3/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/p3/handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/p3/handlers_helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/p3/handlers_helpers.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,10 +19,22 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-76">
-              <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
+            <state relative-caret-position="520">
+              <caret line="20" column="1" lean-forward="true" selection-start-line="11" selection-end-line="20" selection-end-column="1" />
               <folding>
                 <element signature="e#14#109#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main2.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+              <folding>
+                <element signature="e#14#117#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -32,8 +43,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/p3/handlers.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="31">
-              <caret line="260" selection-start-line="260" selection-end-line="260" />
+            <state relative-caret-position="2">
+              <caret line="217" column="75" selection-start-line="217" selection-start-column="75" selection-end-line="217" selection-end-column="75" />
               <folding>
                 <element signature="e#12#51#0" expanded="true" />
               </folding>
@@ -44,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/p3/data/peerList.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="25">
-              <caret line="180" column="32" selection-start-line="180" selection-start-column="32" selection-end-line="180" selection-end-column="32" />
+            <state relative-caret-position="3640">
+              <caret line="147" column="28" selection-start-line="147" selection-start-column="28" selection-end-line="147" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -53,8 +64,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/p3/data/heartbeat.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="61" column="20" lean-forward="true" selection-start-line="61" selection-start-column="20" selection-end-line="61" selection-end-column="20" />
+            <state relative-caret-position="295">
+              <caret line="66" column="25" selection-start-line="66" selection-start-column="25" selection-end-line="66" selection-end-column="25" />
               <folding>
                 <element signature="e#14#44#0" expanded="true" />
               </folding>
@@ -65,8 +76,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/p3/data/SyncBlockChain.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="580">
-              <caret line="109" column="26" selection-start-line="109" selection-start-column="26" selection-end-line="109" selection-end-column="26" />
+            <state relative-caret-position="394">
+              <caret line="53" column="16" selection-start-line="53" selection-start-column="16" selection-end-line="53" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/p2/Block.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="682">
+              <caret line="37" column="19" lean-forward="true" selection-start-line="37" selection-start-column="19" selection-end-line="37" selection-end-column="19" />
+              <folding>
+                <element signature="e#12#177#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -113,13 +136,14 @@
         <option value="$PROJECT_DIR$/p3/routes.go" />
         <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/main1.go" />
-        <option value="$PROJECT_DIR$/p2/BlockChain.go" />
         <option value="$PROJECT_DIR$/p3/handlers_test.go" />
         <option value="$PROJECT_DIR$/p3/data/SyncBlockChain.go" />
         <option value="$PROJECT_DIR$/p2/Converting_helpers.go" />
         <option value="$PROJECT_DIR$/p3/handlers_helpers.go" />
         <option value="$PROJECT_DIR$/p3/data/heartbeat.go" />
+        <option value="$PROJECT_DIR$/main2.go" />
         <option value="$PROJECT_DIR$/p3/data/peerList.go" />
+        <option value="$PROJECT_DIR$/p2/BlockChain.go" />
         <option value="$PROJECT_DIR$/p3/handlers.go" />
       </list>
     </option>
@@ -150,12 +174,6 @@
               <item name="cs686-blockchain-p3-TeeanRonson" type="b2602c69:ProjectViewProjectNode" />
               <item name="cs686-blockchain-p3-TeeanRonson" type="462c0819:PsiDirectoryNode" />
               <item name="p3" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cs686-blockchain-p3-TeeanRonson" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cs686-blockchain-p3-TeeanRonson" type="462c0819:PsiDirectoryNode" />
-              <item name="p3" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -191,13 +209,23 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build main1.go">
-    <configuration name="go build main1.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build main.go">
+    <configuration name="go build main1.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="cs686-blockchain-p3-TeeanRonson" />
       <working_directory value="$PROJECT_DIR$/" />
       <parameters value="6687 off" />
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/main1.go" />
+      <package value="github.com/teeanronson/cs686-blockchain-p3-TeeanRonson" />
+      <directory value="$PROJECT_DIR$/" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main2.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="cs686-blockchain-p3-TeeanRonson" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <parameters value="6688 off" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/main2.go" />
       <package value="github.com/teeanronson/cs686-blockchain-p3-TeeanRonson" />
       <directory value="$PROJECT_DIR$/" />
       <method v="2" />
@@ -258,14 +286,15 @@
       <item itemvalue="Go Test.MerklePatriciaTrie_test.go" />
       <item itemvalue="Go Test.peerList_test.go" />
       <item itemvalue="Go Test.SyncBlockChain_test.go" />
+      <item itemvalue="Go Build.go build main2.go" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build main2.go" />
+        <item itemvalue="Go Build.go build main1.go" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.peerList_test.go" />
         <item itemvalue="Go Test.SyncBlockChain_test.go" />
-        <item itemvalue="Go Test.MerklePatriciaTrie_test.go" />
-        <item itemvalue="Go Build.go build testingMPT.go" />
       </list>
     </recent_temporary>
   </component>
@@ -314,7 +343,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" side_tool="true" visible="true" weight="0.46625128" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" side_tool="true" visible="true" weight="0.52751815" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.1349948" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -427,13 +456,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/p3/routes.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-80">
-          <caret line="18" column="8" lean-forward="true" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/p3/logger.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="151">
@@ -486,46 +508,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/p2/BlockChain.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-150">
-          <caret line="90" column="42" selection-start-line="90" selection-start-column="36" selection-end-line="90" selection-end-column="42" />
-          <folding>
-            <element signature="e#12#126#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/p3/data/SyncBlockChain.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="109" column="26" selection-start-line="109" selection-start-column="26" selection-end-line="109" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/p3/router.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="62">
           <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
           <folding>
             <element signature="e#12#60#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/p2/Block.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-76">
-          <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
-          <folding>
-            <element signature="e#14#109#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -540,27 +528,81 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/p3/data/heartbeat.go">
+    <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="61" column="20" lean-forward="true" selection-start-line="61" selection-start-column="20" selection-end-line="61" selection-end-column="20" />
+        <state relative-caret-position="520">
+          <caret line="20" column="1" lean-forward="true" selection-start-line="11" selection-end-line="20" selection-end-column="1" />
           <folding>
-            <element signature="e#14#44#0" expanded="true" />
+            <element signature="e#14#109#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main2.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+          <folding>
+            <element signature="e#14#117#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/p3/data/peerList.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25">
-          <caret line="180" column="32" selection-start-line="180" selection-start-column="32" selection-end-line="180" selection-end-column="32" />
+        <state relative-caret-position="3640">
+          <caret line="147" column="28" selection-start-line="147" selection-start-column="28" selection-end-line="147" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/p3/data/heartbeat.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="295">
+          <caret line="66" column="25" selection-start-line="66" selection-start-column="25" selection-end-line="66" selection-end-column="25" />
+          <folding>
+            <element signature="e#14#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/p2/BlockChain.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="71" column="5" selection-start-line="71" selection-start-column="5" selection-end-line="71" selection-end-column="5" />
+          <folding>
+            <element signature="e#12#126#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/p3/data/SyncBlockChain.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="394">
+          <caret line="53" column="16" selection-start-line="53" selection-start-column="16" selection-end-line="53" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/p2/Block.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="682">
+          <caret line="37" column="19" lean-forward="true" selection-start-line="37" selection-start-column="19" selection-end-line="37" selection-end-column="19" />
+          <folding>
+            <element signature="e#12#177#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/p3/routes.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="18" column="8" lean-forward="true" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/p3/handlers.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="31">
-          <caret line="260" selection-start-line="260" selection-end-line="260" />
+        <state relative-caret-position="2">
+          <caret line="217" column="75" selection-start-line="217" selection-start-column="75" selection-end-line="217" selection-end-column="75" />
           <folding>
             <element signature="e#12#51#0" expanded="true" />
           </folding>

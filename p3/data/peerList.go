@@ -146,7 +146,6 @@ Get a copy of self Peer Map
 func(peers *PeerList) Copy() map[string]int32 {
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
-	//fmt.Println("------------PeerMap", peers.peerMap)
 	return peers.peerMap
 }
 
@@ -183,15 +182,11 @@ func(peers *PeerList) InjectPeerMapJson(peerMap map[string]int32, senderAddr str
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
 	//newPeersList := make([]SinglePeer, 0)
-	fmt.Println("senderAddr", senderAddr)
-	fmt.Println("senderId", senderId)
 	peers.peerMap[senderAddr] = senderId
 
 	//add everything except yours
 	for addr, id := range peerMap {
 		if !reflect.DeepEqual(id, peers.selfId) {
-			fmt.Println("Adding id:", id)
-			fmt.Println("My id is:", peers.selfId)
 			peers.peerMap[addr] = id
 		}
 	}
