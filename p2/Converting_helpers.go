@@ -51,6 +51,7 @@ func jsonToBlockJson(jsonString string) (BlockJson, error) {
 
     blockJson := BlockJson{}
     if err := json.Unmarshal([]byte(jsonString), &blockJson); err != nil {
+        fmt.Println("Can't convert Json to BlockJson")
         panic(err)
         return blockJson, err
     }

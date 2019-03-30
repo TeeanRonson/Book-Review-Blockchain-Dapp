@@ -31,4 +31,17 @@ func decodeJsonToHbd(hbd string) data.HeartBeatData {
     return recvHeartBeatData
 }
 
+/**
+Decode the JsonString into HeartBeatData
+ */
+func decodeJsonToHbdMod(hbd string) data.HeartBeatDataMod {
+
+    recvHeartBeatData := data.HeartBeatDataMod{}
+    if err := json.Unmarshal([]byte(hbd), &recvHeartBeatData); err != nil {
+        fmt.Println("Can't Unmarshal in decodeHBD")
+        return recvHeartBeatData
+    }
+    return recvHeartBeatData
+}
+
 

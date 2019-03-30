@@ -52,7 +52,6 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		block := p2.Block{}
 		block.CreateGenesisBlock()
 		SBC.Insert(block)
-		fmt.Println("Printing the block", block)
 	} else {
 		Download()
 	}
@@ -93,7 +92,6 @@ You may not need it after node starts heartBeats.
 func Download() {
 
 	resp, _ := http.Get(GET_BC_FIRST_NODE + "?id=" + os.Args[1])
-
 
 	currBlockChain, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -193,14 +191,15 @@ If so, do these:
 func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 
 	//ifStarted wait till we finish downloading BC
-	b, err := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
 	//Convert Json into HeartBeatData
-	hbd := decodeJsonToHbd(string(b))
+	hbd := decodeJsonToHbdMod(string(body))
 	fmt.Println("Received HEARTBEAT:", hbd)
 	//Add sender PeerMap and sender into PeerMap
 	Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
@@ -208,7 +207,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 	if hbd.IfNewBlock {
 		//Get the new block
 		recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
-		fmt.Println("Through:", recvBlock)
+		fmt.Println("The received block:", recvBlock)
 		if !SBC.CheckParentHash(recvBlock) {
 			//Asks for the parent block and inserts the parent block
 			AskForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
@@ -216,6 +215,8 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 		SBC.Insert(recvBlock)
 		fmt.Println("Inserted successfully")
 		hbd.Hops = hbd.Hops - 1
+		hbd.Addr = os.Args[1]
+		hbd.Id = convertToInt32(os.Args[1])
 		if hbd.Hops > 0 {
 			ForwardHeartBeat(hbd)
 		}
@@ -256,7 +257,7 @@ func AskForBlock(height int32, hash string) {
 /**
 Send the HeartBeatData to all peers in local PeerMap.
  */
-func ForwardHeartBeat(heartBeatData data.HeartBeatData) {
+func ForwardHeartBeat(heartBeatData data.HeartBeatDataMod) {
 
 	if !heartBeatData.IfNewBlock {
 		return
@@ -269,7 +270,6 @@ func ForwardHeartBeat(heartBeatData data.HeartBeatData) {
 	for addr, _ := range Peers.Copy() {
 		recipient := HTTPLOCALHOST + addr + "/heartbeat/receive"
 		fmt.Println("The recipient is:", recipient)
-		fmt.Println("The contents are:", string(jsonFormatted))
 		//send HeartBeatData to all peers in the local PeerMap
 		_, err := http.Post(recipient, "application/json; charset=UTF-8", strings.NewReader(string(jsonFormatted)))
 		if err != nil {
@@ -284,14 +284,26 @@ Start a while loop. Inside the loop, sleep for randomly 5~10 seconds,
 then use PrepareHeartBeatData() to create a HeartBeatData,
 and send it to all peers in the local PeerMap.
  */
+//func StartHeartBeat() {
+//
+//	for {
+//		time.Sleep(3 * time.Second)
+//		fmt.Println("HeartBeat", os.Args[1])
+//		peerMapAsJson, _ := Peers.PeerMapToJson()
+//		selfAdd := os.Args[1]
+//		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), peerMapAsJson, selfAdd)
+//		ForwardHeartBeat(hbd)
+//	}
+//}
+
 func StartHeartBeat() {
 
 	for {
 		time.Sleep(3 * time.Second)
 		fmt.Println("HeartBeat", os.Args[1])
-		peerMapAsJson, _ := Peers.PeerMapToJson()
+		//peerMapAsJson, _ := Peers.PeerMapToJson()
 		selfAdd := os.Args[1]
-		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), peerMapAsJson, selfAdd)
+		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAdd)
 		ForwardHeartBeat(hbd)
 	}
 }

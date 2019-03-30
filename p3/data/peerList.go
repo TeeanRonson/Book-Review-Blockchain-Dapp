@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
+	"reflect"
 	"sync"
 )
 
@@ -144,7 +146,7 @@ Get a copy of self Peer Map
 func(peers *PeerList) Copy() map[string]int32 {
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
-	fmt.Println("------------PeerMap", peers.peerMap)
+	//fmt.Println("------------PeerMap", peers.peerMap)
 	return peers.peerMap
 }
 
@@ -176,28 +178,52 @@ func(peers *PeerList) PeerMapToJson() (string, error) {
 /**
 Inject NewPeerMap to existing PeerMap
  */
-func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, senderAddr string, senderId int32) {
+func(peers *PeerList) InjectPeerMapJson(peerMap map[string]int32, senderAddr string, senderId int32) {
 
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
-	newPeersList := make([]SinglePeer, 0)
-	fmt.Println("ADDRESS:", senderAddr)
-	fmt.Println("ID:", senderId)
-	fmt.Println("PeerMap:", peerMapJsonStr)
+	//newPeersList := make([]SinglePeer, 0)
+	fmt.Println("senderAddr", senderAddr)
+	fmt.Println("senderId", senderId)
 	peers.peerMap[senderAddr] = senderId
 
-
-
-	//if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
-	//	fmt.Println("Error in InjectPeerMapJson")
-	//	panic(err)
-	//	return
-	//}
-	////add everything except yours
-	//fmt.Println("These are the peers we have received:", newPeersList)
-	//for _, item := range newPeersList {
-	//	if item.peerId != peers.selfId {
-	//		peers.peerMap[item.peerAdd] = item.peerId
-	//	}
-	//}
+	//add everything except yours
+	for addr, id := range peerMap {
+		if !reflect.DeepEqual(id, peers.selfId) {
+			fmt.Println("Adding id:", id)
+			fmt.Println("My id is:", peers.selfId)
+			peers.peerMap[addr] = id
+		}
+	}
+	fmt.Println("My PeerMap should not contain myself:", os.Args[1], peers.peerMap)
 }
+
+
+///**
+//Inject NewPeerMap to existing PeerMap
+// */
+//func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, senderAddr string, senderId int32) {
+//
+//	peers.mux.Lock()
+//	defer peers.mux.Unlock()
+//	newPeersList := make([]SinglePeer, 0)
+//	peers.peerMap[senderAddr] = senderId
+//
+//	for k, v := range peerMapJsonStr {
+//		fmt.Println("Key", k)
+//		fmt.Println("value", string(v))
+//	}
+//
+//	//if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
+//	//	fmt.Println("Error in InjectPeerMapJson")
+//	//	panic(err)
+//	//	return
+//	//}
+//	//add everything except yours
+//	fmt.Println("These are the peers we have received:", peerMapJsonStr)
+//	for _, item := range newPeersList {
+//		if item.peerId != peers.selfId {
+//			peers.peerMap[item.peerAdd] = item.peerId
+//		}
+//	}
+//}
