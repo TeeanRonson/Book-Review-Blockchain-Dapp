@@ -34,7 +34,6 @@ func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString s
 
 	//create a new block
 	if rand.Intn(100) < 50 {
-
 		mpt := p1.GetMPTrie()
 		block := sbc.GenBlock(mpt)
 		blockJson, err := block.EncodeToJson()

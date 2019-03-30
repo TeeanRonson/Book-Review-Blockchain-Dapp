@@ -112,6 +112,7 @@ func(sbc *SyncBlockChain) GenBlock(mpt p1.MerklePatriciaTrie) p2.Block {
 	sbc.mux.Lock()
 	defer sbc.mux.Unlock()
 	newBlock := p2.Block{}
+
 	//generate a new block by passing in (height + 1, the parentHash, mpt)
 	height := sbc.bc.Length + 1
 	parentHash := sbc.bc.Chain[height][0].Header.ParentHash
@@ -119,6 +120,9 @@ func(sbc *SyncBlockChain) GenBlock(mpt p1.MerklePatriciaTrie) p2.Block {
 	return newBlock
 }
 
+/**
+Show the block chain
+ */
 func(sbc *SyncBlockChain) Show() string {
 	return sbc.bc.Show()
 }

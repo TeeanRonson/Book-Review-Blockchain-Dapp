@@ -60,7 +60,6 @@ func(peers *PeerList) Rebalance() {
 	//if len(peers.peerMap) <= 32 {
 	//	return
 	//}
-
 	index := 0
 	added := false
 	peerListId := RebalanceHelper(peers.peerMap)
@@ -181,12 +180,12 @@ func(peers *PeerList) PeerMapToJson() (string, error) {
 /**
 Inject NewPeerMap to existing PeerMap
  */
-func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, selfAddr string) {
+func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, senderAddr string, senderId int32) {
 
 	peers.mux.Lock()
 	defer peers.mux.Unlock()
 	newPeersList := make([]SinglePeer, 0)
-	peers.peerMap[selfAddr] = peers.selfId
+	peers.peerMap[senderAddr] = senderId
 
 	if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
 		fmt.Println("Error in InjectPeerMapJson")

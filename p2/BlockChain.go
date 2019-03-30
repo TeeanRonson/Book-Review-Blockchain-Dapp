@@ -49,13 +49,14 @@ we ignore it because we don't store duplicate blocks; if not, insert the block i
 func (bc *BlockChain) Insert(block Block) {
 
 	currChain := bc.Get(block.Header.Height)
-	fmt.Println("\nRound-----")
+	fmt.Println("\nInsert New Block")
 
 	if currChain == nil {
 		//fmt.Println("No []Block at that height: append to Block height:", block.Header.Height)
 		newChain := make([]Block, 0)
 		newChain = append(newChain, block)
 		//add a new chain at the height
+		fmt.Println("block header height", block.Header.Height)
 		bc.Chain[block.Header.Height] = newChain
 	} else {
 		for _, currBlock := range currChain {
