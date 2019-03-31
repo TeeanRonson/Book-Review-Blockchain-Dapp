@@ -9,12 +9,18 @@ import (
 
 func convertToInt32(value string) int32 {
 
-    i, err := strconv.ParseInt(value, 10, 32)
+    i, err := strconv.ParseInt(value, 10, 64)
     if err != nil {
-        fmt.Println("Unable to convert string to int")
-        panic(err)
+       fmt.Println("Unable to convert string to int")
+       panic(err)
     }
     return int32(i)
+    //i1, err := strconv.Atoi(value)
+    //if err != nil {
+    //    fmt.Println(i1)
+    //    panic(err)
+    //}
+    //return int32(i1)
 }
 
 func int32ToString(n int32) string {
