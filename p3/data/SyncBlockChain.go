@@ -82,7 +82,9 @@ Replace existing blockchain with the new BlockChainJson
 func(sbc *SyncBlockChain) UpdateEntireBlockChain(blockChainJson string) {
 	sbc.mux.Lock()
 	defer sbc.mux.Unlock()
+	//inserts each block into a newly created block chain and returns the block chain
 	newBlockChain, err := p2.BlockChainDecodeFromJson(blockChainJson)
+	fmt.Println("The block chain we downloaded:", newBlockChain)
 	if err != nil {
 		fmt.Println("UpdateEntireBlockChain error")
 		panic(err)

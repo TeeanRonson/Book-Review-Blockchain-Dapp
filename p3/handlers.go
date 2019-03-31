@@ -53,10 +53,17 @@ func Start(w http.ResponseWriter, r *http.Request) {
 		block.CreateGenesisBlock()
 		SBC.Insert(block)
 	} else {
+		fmt.Println("Fetching the blockchain")
 		Download()
 	}
 	ifStarted = true
 	go StartHeartBeat()
+	_, err :=fmt.Fprint(w, "ifStarted: ", ifStarted)
+	if err != nil {
+		_, err := fmt.Fprint(w, "ifStarted: ", false)
+		panic(err)
+	}
+
 }
 
 /**
@@ -98,7 +105,7 @@ func Download() {
 		fmt.Println("Can't read response body")
 		log.Fatal(err)
 	}
-	fmt.Println("The block chain we downloaded:", string(currBlockChain))
+
 	SBC.UpdateEntireBlockChain(string(currBlockChain))
 }
 
@@ -136,6 +143,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		//TODO: Do we have to return the id of this sender to the request client?
+		fmt.Println("Send this blockchain to newcomer:", blockChainJson)
 		fmt.Fprint(w, blockChainJson)
 	}
 }
@@ -219,7 +227,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 				askForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
 			}
 			SBC.Insert(recvBlock)
-			fmt.Println("Inserted successfully")
+			fmt.Println("Inserted successfully:", recvBlock)
 			hbd.Hops = hbd.Hops - 1
 			hbd.Addr = os.Args[1]
 			hbd.Id = convertToInt32(os.Args[1])
@@ -235,9 +243,11 @@ Loop through all peers in local PeerMap to download a block. As soon as one peer
 add the block to the block chain
  */
 func askForBlock(height int32, hash string) {
+	fmt.Println("Ask for parent at height:", height)
+	fmt.Println("Ask for parent hash:", hash)
 
 	for addr, _ := range Peers.Copy() {
-		endPoint := HTTPLOCALHOST + addr + "/block/" + string(height) + "/"+ hash
+		endPoint := HTTPLOCALHOST + addr + "/block/" + int32ToString(height) + "/"+ hash
 		fmt.Println("EndPoint in AskforBlock:", endPoint)
 		resp, err := http.Get(endPoint)
 		if err != nil {

@@ -125,7 +125,7 @@ func(peers *PeerList) Show() string {
 	defer peers.mux.Unlock()
 	var result string
 	for key, entry := range peers.peerMap {
-		result += "Address = " + key + " Id = " + string(entry) + "\n"
+		result += "Address = " + string(key) + " Id = " + string(entry) + "\n"
 	}
 	return result
 }

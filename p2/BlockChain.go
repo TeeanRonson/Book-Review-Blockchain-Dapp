@@ -57,6 +57,8 @@ func (bc *BlockChain) Insert(block Block) {
 		newChain = append(newChain, block)
 		//add a new chain at the height
 		fmt.Println("block header height", block.Header.Height)
+		fmt.Println("Inserting this block:", block)
+
 		bc.Chain[block.Header.Height] = newChain
 
 	} else {
