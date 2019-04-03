@@ -21,6 +21,7 @@ func blockToBlockJson(b Block) BlockJson {
         b.Header.Hash,
         b.Header.ParentHash,
         b.Header.Size,
+        b.Header.Nonce,
         b.Mpt.Inputs,
     }
     return blockJson

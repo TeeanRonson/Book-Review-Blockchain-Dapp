@@ -1,6 +1,8 @@
 package p3
 
-import "testing"
+import (
+    "testing"
+)
 
 func TestConvertStringToInt32(t *testing.T) {
 
@@ -12,4 +14,14 @@ func TestConvertStringToInt32(t *testing.T) {
     if result != expect {
         t.Fail()
     }
+}
+
+func TestProofOfWork(t *testing.T) {
+
+    parentHash := "12312h12j3j12b3k12k3238424"
+    mptRootHash := "123jn3446h3j12b3k12k323842"
+   if ProofOfWorkTest(mptRootHash, parentHash) != true {
+       t.Fail()
+   }
+
 }

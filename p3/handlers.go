@@ -1,10 +1,13 @@
 package p3
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
+	"golang.org/x/crypto/sha3"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -95,6 +98,21 @@ func Register() {
 }
 
 /**
+Method: GET
+Description: Shows the PeerMap and the BlockChain.
+ */
+func Show(w http.ResponseWriter, r *http.Request) {
+
+	_, _ = fmt.Fprintf(w, "%s\n%s", Peers.Show(), SBC.Show())
+
+}
+
+func Canonical(w http.ResponseWriter, r *http.Request) {
+
+
+}
+
+/**
 Download the current BlockChain from the primary node
  */
 func Download() {
@@ -107,16 +125,6 @@ func Download() {
 		log.Fatal(err)
 	}
 	SBC.UpdateEntireBlockChain(string(currBlockChain))
-}
-
-/**
-Method: GET
-Description: Shows the PeerMap and the BlockChain.
- */
-func Show(w http.ResponseWriter, r *http.Request) {
-
-	_, _ = fmt.Fprintf(w, "%s\n%s", Peers.Show(), SBC.Show())
-
 }
 
 /**
@@ -190,83 +198,25 @@ func UploadBlock(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/**
-/heartbeat/receive
-Method: POST
-Description: Receive a heartbeat from another Node.
-Add the sender address, Id, and PeerMap into local PeerMap. Then check if the HeartBeatData contains a new block.
-If true:
-(1) check if the parent block exists. If not, call AskForBlock() to download the parent block.
-(2) insert the received block into the blockChain
-(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
- */
-func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
-
-	//ifStarted wait till we finish downloading BC
-	if ifStarted {
-		body, err := ioutil.ReadAll(r.Body)
-		defer r.Body.Close()
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		//Convert Json into HeartBeatData
-		hbd := decodeJsonToHbdMod(string(body))
-		//Add sender PeerMap and sender into PeerMap
-		Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
-		//if HeartBeatData has a new block
-		if hbd.IfNewBlock {
-			//Get the new block
-			recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
-			if !SBC.CheckParentHash(recvBlock) {
-				//Asks for the parent block and inserts the parent block
-				fmt.Println("ASKING FOR A BLOCK!!!! -----------------------")
-				askForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
-			}
-			SBC.Insert(recvBlock)
-			fmt.Println("Inserted successfully:", recvBlock)
-			hbd.Hops = hbd.Hops - 1
-			hbd.Addr = os.Args[1]
-			hbd.Id = convertToInt32(os.Args[1])
-			if hbd.Hops > 0 {
-				ForwardHeartBeat(hbd)
-			}
-		}
-	}
-}
 
 /**
-Loop through all peers in local PeerMap to download the requested block.
-As soon as one peer returns the block, add the block to the block chain and stop the loop.
-
+Decide once every interval (3secs) if this Node should create a block
+If we decide to create a block:
+1. Prepare a HeartBeatData
+2. Forward onto other peers
  */
-func askForBlock(height int32, hash string) {
+func StartHeartBeat() {
 
-	if ifStarted {
-		for addr, _ := range Peers.Copy() {
-			endPoint := HTTPLOCALHOST + addr + "/block/" + int32ToString(height) + "/"+ hash
-			fmt.Println("EndPoint in AskforBlock:", endPoint)
-			resp, err := http.Get(endPoint)
-			if err != nil {
-				fmt.Println("AskForBlock Error")
-				log.Fatal(err)
-			}
-
-			bytes, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Println("Unable to read AskForBlock body")
-				log.Fatal(err)
-			}
-			message := string(bytes)
-			fmt.Println("the received message should be a json block:", message)
-
-			if resp.StatusCode == http.StatusOK {
-				//Then we should've received a blockJson
-				block, _ := p2.DecodeFromJson(message)
-				SBC.Insert(block)
-				break
-			}
+	for {
+		time.Sleep(3 * time.Second)
+		fmt.Println("HeartBeat", os.Args[1])
+		selfAdd := os.Args[1]
+		//if we solve Pow and no one else has solved it
+		if ProofOfWork() {
+			hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAdd)
+			ForwardHeartBeat(hbd)
 		}
+
 	}
 }
 
@@ -293,20 +243,131 @@ func ForwardHeartBeat(heartBeatData data.HeartBeatDataMod) {
 	}
 }
 
-
 /**
-Decide once every interval (3secs) if this Node should create a block
-If we decide to create a block:
-1. Prepare a HeartBeatData
-2. Forward onto other peers
+/heartbeat/receive
+Method: POST
+Description: Receive a heartbeat from another Node.
+Add the sender address, Id, and PeerMap into local PeerMap. Then check if the HeartBeatData contains a new block.
+If true:
+(1) Verify that the sender has completed proof of work
+(2) check if the parent block exists. If not, call AskForBlock() to download the parent block.
+(2) insert the received block into the blockChain
+(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
  */
-func StartHeartBeat() {
+func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 
-	for {
-		time.Sleep(3 * time.Second)
-		fmt.Println("HeartBeat", os.Args[1])
-		selfAdd := os.Args[1]
-		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAdd)
-		ForwardHeartBeat(hbd)
+	//ifStarted wait till we finish downloading BC
+	if ifStarted {
+		body, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		//Convert Json into HeartBeatData
+		hbd := decodeJsonToHbdMod(string(body))
+		Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
+		//if HeartBeatData has a new block
+		if hbd.IfNewBlock {
+			//Get the new block
+			recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
+
+			if verifyProofOfWork(recvBlock) {
+				currBlock := recvBlock
+				for !SBC.CheckParentHash(currBlock) {
+					fmt.Println("ASKING FOR A BLOCK!!!! -----------------------")
+					parent := askForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
+					SBC.Insert(parent)
+					if reflect.DeepEqual(parent.Header.Hash, "GenesisBlock") {
+						break
+					}
+					currBlock = parent
+				}
+				//Insert the latest block received
+				SBC.Insert(recvBlock)
+				fmt.Println("Inserted successfully:", recvBlock)
+				hbd.Hops = hbd.Hops - 1
+				hbd.Addr = os.Args[1]
+				hbd.Id = convertToInt32(os.Args[1])
+				if hbd.Hops > 0 {
+					ForwardHeartBeat(hbd)
+				}
+			}
+		}
 	}
 }
+
+/**
+Loop through all peers in local PeerMap requesting the block with the input hash
+As soon as one peer returns the block, return the block
+ */
+func askForBlock(height int32, hash string) p2.Block {
+	var parent p2.Block
+
+	if ifStarted {
+		for addr, _ := range Peers.Copy() {
+			endPoint := HTTPLOCALHOST + addr + "/block/" + int32ToString(height) + "/"+ hash
+			fmt.Println("EndPoint in AskforBlock:", endPoint)
+			resp, err := http.Get(endPoint)
+
+			if err != nil {
+				fmt.Println("AskForBlock Error")
+				log.Fatal(err)
+			}
+
+			bytes, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println("Unable to read AskForBlock body")
+				log.Fatal(err)
+			}
+
+			message := string(bytes)
+			//fmt.Println("the received message should be a json block:", message)
+			if resp.StatusCode == http.StatusOK {
+				//Then we should've received a blockJson
+				block, _ := p2.DecodeFromJson(message)
+				parent = block
+				//SBC.Insert(block)
+				return parent
+			}
+		}
+	}
+	return parent
+}
+
+/**
+This function starts a new thread that tries different nonces to generate new blocks.
+Nonce is a string of 16 hexes such as "1f7b169c846f218a".
+Initialize the rand when you start a new node with something unique about each node,
+such as the current time or the port number. Here's the workflow of generating blocks:
+    (1) Start a while loop.
+    (2) Get the latest block or one of the latest blocks to use as a parent block.
+    (3) Create an MPT.
+    (4) Randomly generate the first nonce, verify it with simple PoW algorithm to see if SHA3(parentHash + nonce + mptRootHash)
+		starts with 10 0's (or the number you modified into).
+		Since we use one laptop to try different nonces, six to seven 0's could be enough.
+		If the nonce failed the verification, increment it by 1 and try the next nonce.
+    (6) If a nonce is found and the next block is generated, forward that block to all peers with an HeartBeatData;
+    (7) If someone else found a nonce first, and you received the new block through your function ReceiveHeartBeat(), stop trying nonce on the current block, continue to the while loop by jumping to the step(2).
+ */
+func ProofOfWork() bool {
+
+	sum := sha3.Sum256([]byte("dummyResult"))
+	pow := hex.EncodeToString(sum[:])
+
+	for true {
+		parentHash := SBC.GetLatestBlocks()[0].Header.Hash
+		mptRootHash := p1.GetMPTrie().Root
+
+		for !CheckProofOfWork(pow) {
+			nonce, _ := RandomHex()
+			result := sha3.Sum256([]byte(parentHash + nonce + mptRootHash))
+			pow = hex.EncodeToString(result[:])
+		}
+		return true
+	}
+	return false
+}
+
+
+

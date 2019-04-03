@@ -3,9 +3,6 @@ package data
 import (
 	"fmt"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
-	"math/rand"
-
-
 )
 
 type HeartBeatData struct {
@@ -62,7 +59,7 @@ if yes, do:
 func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString map[string]int32, addr string) HeartBeatDataMod {
 
 	//create a new block
-	if rand.Intn(100) < 50 {
+	//if rand.Intn(100) < 50 {
 		mpt := p1.GetMPTrie()
 		block := sbc.GenBlock(mpt)
 		blockJson, err := block.EncodeToJson()
@@ -72,8 +69,8 @@ func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString m
 		}
 		fmt.Println("We created a block!")
 		return HeartBeatDataMod{true, selfId, blockJson, peerMapJsonString, addr, 3}
-	} else { //don't create a new block
-		fmt.Println("We are not creating a block!")
-		return HeartBeatDataMod{false, selfId, "", peerMapJsonString, addr, 3}
-	}
+	//} else { //don't create a new block
+	//	fmt.Println("We are not creating a block!")
+	//	return HeartBeatDataMod{false, selfId, "", peerMapJsonString, addr, 3}
+	//}
 }

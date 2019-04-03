@@ -14,8 +14,8 @@ type SyncBlockChain struct {
 }
 
 /**
-TODO: Could this be an issue?
- */
+Create a new SyncBlockChain
+*/
 func NewBlockChain() SyncBlockChain {
 	return SyncBlockChain{bc: p2.NewBlockChain(), mux: sync.Mutex{}}
 }
@@ -28,6 +28,24 @@ func(sbc *SyncBlockChain) Get(height int32) []p2.Block {
 	defer sbc.mux.Unlock()
 	return sbc.bc.Get(height)
 }
+
+/**
+Get the latest blocks from this blockChain
+ */
+func (sbc *SyncBlockChain) GetLatestBlocks() []p2.Block {
+	sbc.mux.Lock()
+	defer sbc.mux.Unlock()
+	return sbc.bc.GetLatestBlocks()
+}
+
+/**
+Get the parent of the input block
+ */
+ func (sbc *SyncBlockChain) GetParentBlock(child p2.Block) p2.Block {
+	 sbc.mux.Lock()
+	 defer sbc.mux.Unlock()
+	 return sbc.bc.GetParentBlock(child)
+ }
 
 /**
 Get the block at the input height with the input hash

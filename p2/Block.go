@@ -20,6 +20,7 @@ type Header struct {
     Hash string                 `json:"hash"`
     ParentHash string           `json:"parentHash"`
     Size int32                  `json:"size"`
+    Nonce string                `json:"nonce"`
 }
 
 type BlockJson struct {
@@ -28,6 +29,7 @@ type BlockJson struct {
     Hash       string            `json:"hash"`
     ParentHash string            `json:"parentHash"`
     Size       int32             `json:"size"`
+    Nonce      string            `json:"nonce"`
     MPT        map[string]string `json:"mpt"`
 }
 
@@ -44,7 +46,7 @@ func (b *Block) NewBlock(height int32, parentHash string, value p1.MerklePatrici
     header.Timestamp = int64(time.Now().Unix())
     header.ParentHash = parentHash
     header.Size = int32(len(mptAsBytes))
-
+    header.Nonce = ""
     hashString := string(header.Height) + string(header.Timestamp) + header.ParentHash + value.Root + string(header.Size)
     sum := sha3.Sum256([]byte(hashString))
     header.Hash = hex.EncodeToString(sum[:])
@@ -58,7 +60,7 @@ Method creates the Genesis block
  */
 func (b *Block) CreateGenesisBlock() {
 
-    header := Header{0, int64(time.Now().Unix()), "GenesisBlock", "", 0}
+    header := Header{0, int64(time.Now().Unix()), "GenesisBlock", "", 0, ""}
     b.Mpt = p1.GetMPTrie()
     b.Header = header
 }
@@ -82,6 +84,7 @@ func DecodeFromJson(jsonString string) (Block, error) {
   header.Hash = blockJson.Hash
   header.ParentHash = blockJson.ParentHash
   header.Size = blockJson.Size
+  header.Nonce = blockJson.Nonce
 
   newBlock.Header = header
   newBlock.Mpt = mpt
@@ -99,6 +102,7 @@ func (b *Block) EncodeToJson() (string, error) {
         b.Header.Hash,
         b.Header.ParentHash,
         b.Header.Size,
+        b.Header.Nonce,
         b.Mpt.Inputs,
     }
 

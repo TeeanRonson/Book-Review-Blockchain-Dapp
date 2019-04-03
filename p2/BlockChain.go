@@ -30,7 +30,7 @@ func NewBlockChain() BlockChain {
 /**
 This function takes a height as the argument,
 returns the list of blocks stored in that height or None if the height doesn't exist.
- */
+*/
 func (bc *BlockChain) Get(height int32) []Block {
 
 	currChain := bc.Chain[height]
@@ -41,6 +41,32 @@ func (bc *BlockChain) Get(height int32) []Block {
 }
 
 /**
+Return the set of latest blocks
+ */
+ func (bc *BlockChain) GetLatestBlocks() []Block {
+ 	return bc.Get(bc.Length)
+ }
+
+/**
+Returns the parent of the input block
+ */
+func (bc *BlockChain) GetParentBlock(child Block) Block {
+
+	var parent Block
+
+	if child.Header.Height - 1 >= 0 {
+		prevBlocks := bc.Get(child.Header.Height - 1)
+		for _, parent := range prevBlocks {
+			if reflect.DeepEqual(parent.Header.Hash, child.Header.Hash) {
+				return parent
+			}
+		}
+	}
+	return parent
+
+
+}
+/**
 This function takes a block as the argument,
 uses its height to find the corresponding list in the Blockchain's Chain map.
 If the list already contains that block's hash,
@@ -49,16 +75,13 @@ we ignore it because we don't store duplicate blocks; if not, insert the block i
 func (bc *BlockChain) Insert(block Block) {
 
 	currChain := bc.Get(block.Header.Height)
-	fmt.Println("\nInsert New Block")
+	fmt.Println("\nInsert New Block into block chain")
 
 	if currChain == nil {
 		//fmt.Println("No []Block at that height: append to Block height:", block.Header.Height)
 		newChain := make([]Block, 0)
 		newChain = append(newChain, block)
 		//add a new chain at the height
-		fmt.Println("block header height", block.Header.Height)
-		fmt.Println("Inserting this block:", block)
-
 		bc.Chain[block.Header.Height] = newChain
 
 	} else {
@@ -73,6 +96,8 @@ func (bc *BlockChain) Insert(block Block) {
 		bc.Length = block.Header.Height
 	}
 }
+
+
 
 /**
 This function iterates over all the blocks,
