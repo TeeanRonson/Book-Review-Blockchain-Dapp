@@ -44,7 +44,7 @@ func (bc *BlockChain) Get(height int32) []Block {
 Return the set of latest blocks
  */
  func (bc *BlockChain) GetLatestBlocks() []Block {
- 	return bc.Get(bc.Length)
+	 return bc.Get(bc.Length)
  }
 
 /**
@@ -143,6 +143,9 @@ func BlockChainDecodeFromJson(jsonString string) (BlockChain, error) {
 	return newBlockChain, nil
 }
 
+/**
+Show the current blockChain
+ */
 func (bc *BlockChain) Show() string {
 	rs := ""
 	var idList []int

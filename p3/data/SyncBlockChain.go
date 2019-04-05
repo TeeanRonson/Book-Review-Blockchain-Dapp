@@ -32,7 +32,7 @@ func(sbc *SyncBlockChain) Get(height int32) []p2.Block {
 /**
 Get the latest blocks from this blockChain
  */
-func (sbc *SyncBlockChain) GetLatestBlocks() []p2.Block {
+func (sbc *SyncBlockChain) SyncGetLatestBlocks() []p2.Block {
 	sbc.mux.Lock()
 	defer sbc.mux.Unlock()
 	return sbc.bc.GetLatestBlocks()
@@ -41,14 +41,14 @@ func (sbc *SyncBlockChain) GetLatestBlocks() []p2.Block {
 /**
 Get the parent of the input block
  */
- func (sbc *SyncBlockChain) GetParentBlock(child p2.Block) p2.Block {
+ func (sbc *SyncBlockChain) SyncGetParentBlock(child p2.Block) p2.Block {
 	 sbc.mux.Lock()
 	 defer sbc.mux.Unlock()
 	 return sbc.bc.GetParentBlock(child)
  }
 
 /**
-Get the block at the input height with the input hash
+Get the specific block at the input height with the input hash
  */
 func(sbc *SyncBlockChain) GetBlock(height int32, hash string) p2.Block {
 	sbc.mux.Lock()
@@ -135,7 +135,7 @@ func(sbc *SyncBlockChain) GenBlock(mpt p1.MerklePatriciaTrie) p2.Block {
 
 	//generate a new block by passing in (height + 1, the parentHash, mpt)
 	height := sbc.bc.Length + 1
-	parentHash := sbc.bc.Chain[sbc.bc.Length][0].Header.Hash
+	parentHash := sbc.bc.GetLatestBlocks()[0].Header.Hash
 	newBlock.NewBlock(height, parentHash, mpt)
 	return newBlock
 }

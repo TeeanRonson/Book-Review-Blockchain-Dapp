@@ -55,9 +55,9 @@ func RandomHex() (string, error) {
 /**
 Decode the JsonString into HeartBeatData
  */
-func decodeJsonToHbdMod(hbd string) data.HeartBeatDataMod {
+func decodeJsonToHbdMod(hbd string) data.HeartBeatData {
 
-    recvHeartBeatData := data.HeartBeatDataMod{}
+    recvHeartBeatData := data.HeartBeatData{}
     if err := json.Unmarshal([]byte(hbd), &recvHeartBeatData); err != nil {
         fmt.Println("Can't Unmarshal in decodeHBD")
         return recvHeartBeatData
@@ -70,9 +70,8 @@ Check proof of work
  */
 func CheckProofOfWork(value string) bool {
 
-    fmt.Println(value[:4])
-    expected := "0000"
-    if reflect.DeepEqual(value[:4], expected) {
+    expected := "000000"
+    if reflect.DeepEqual(value[:6], expected) {
         return true
     }
     return false

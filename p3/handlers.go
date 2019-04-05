@@ -107,9 +107,13 @@ func Show(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/**
+This function prints the current canonical chain, and chains of all forks if there are forks.
+Note that all forks should end at the same height (otherwise there wouldn't be a fork).
+ */
 func Canonical(w http.ResponseWriter, r *http.Request) {
 
-
+	_, _ = fmt.Fprintf(w, "%s", SBC.Show())
 }
 
 /**
@@ -209,25 +213,32 @@ func StartHeartBeat() {
 
 	for {
 		time.Sleep(3 * time.Second)
-		fmt.Println("HeartBeat", os.Args[1])
-		selfAdd := os.Args[1]
-		//if we solve Pow and no one else has solved it
-		if ProofOfWork() {
-			hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAdd)
-			ForwardHeartBeat(hbd)
-		}
+		fmt.Println("HeartBeat of", os.Args[1])
+		selfAddr := os.Args[1]
 
+		//create a random/empty mpt for now
+		mpt := p1.GetMPTrie()
+
+		//Run ProofOfWork
+		nonce := ProofOfWork(mpt.Root)
+		if reflect.DeepEqual(nonce, "") {
+			fmt.Println("NO NONCE!!!!! ")
+		}
+		fmt.Println("We found the nonce! Lets prepare the HeartBeatData: Nonce = ", nonce)
+		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAddr, mpt, nonce)
+		go ForwardHeartBeat(hbd)
 	}
 }
 
 /**
 Forward the HeartBeatData to all peers in local PeerMap.
  */
-func ForwardHeartBeat(heartBeatData data.HeartBeatDataMod) {
+func ForwardHeartBeat(heartBeatData data.HeartBeatData) {
 
 	if !heartBeatData.IfNewBlock {
 		return
 	}
+	fmt.Println("Sending HBD")
 	jsonFormatted, err := json.MarshalIndent(heartBeatData, "", "")
 	if err != nil {
 		fmt.Println("Error in ForwardHeartBeatData")
@@ -271,26 +282,27 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 		if hbd.IfNewBlock {
 			//Get the new block
 			recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
-
 			if verifyProofOfWork(recvBlock) {
 				currBlock := recvBlock
+				//keep asking for the parent block until we have them all
 				for !SBC.CheckParentHash(currBlock) {
 					fmt.Println("ASKING FOR A BLOCK!!!! -----------------------")
-					parent := askForBlock(recvBlock.Header.Height - 1, recvBlock.Header.ParentHash)
+					parent := askForBlock(currBlock.Header.Height - 1, currBlock.Header.ParentHash)
 					SBC.Insert(parent)
-					if reflect.DeepEqual(parent.Header.Hash, "GenesisBlock") {
+					//If we hit the genesis block, break out of the loop
+					if reflect.DeepEqual(parent.Header.Hash, "") {
 						break
 					}
 					currBlock = parent
 				}
 				//Insert the latest block received
 				SBC.Insert(recvBlock)
-				fmt.Println("Inserted successfully:", recvBlock)
+				fmt.Println("Latest block inserted successfully:", recvBlock)
 				hbd.Hops = hbd.Hops - 1
 				hbd.Addr = os.Args[1]
 				hbd.Id = convertToInt32(os.Args[1])
 				if hbd.Hops > 0 {
-					ForwardHeartBeat(hbd)
+					go ForwardHeartBeat(hbd)
 				}
 			}
 		}
@@ -336,6 +348,8 @@ func askForBlock(height int32, hash string) p2.Block {
 }
 
 /**
+
+TODO: Multi-threading, Canonical print, Initalize rand with something unique?
 This function starts a new thread that tries different nonces to generate new blocks.
 Nonce is a string of 16 hexes such as "1f7b169c846f218a".
 Initialize the rand when you start a new node with something unique about each node,
@@ -347,26 +361,48 @@ such as the current time or the port number. Here's the workflow of generating b
 		starts with 10 0's (or the number you modified into).
 		Since we use one laptop to try different nonces, six to seven 0's could be enough.
 		If the nonce failed the verification, increment it by 1 and try the next nonce.
-    (6) If a nonce is found and the next block is generated, forward that block to all peers with an HeartBeatData;
+    (6) If a nonce is found and the next block is generated, forward that block to all peers with a HeartBeatData;
     (7) If someone else found a nonce first, and you received the new block through your function ReceiveHeartBeat(), stop trying nonce on the current block, continue to the while loop by jumping to the step(2).
  */
-func ProofOfWork() bool {
+func ProofOfWork(mptRootHash string) string {
 
-	sum := sha3.Sum256([]byte("dummyResult"))
-	pow := hex.EncodeToString(sum[:])
+	var checkHeight int32
+	nonce, _ := RandomHex()
 
 	for true {
-		parentHash := SBC.GetLatestBlocks()[0].Header.Hash
-		mptRootHash := p1.GetMPTrie().Root
+		//Update the parentHash and current Height
+		parentHash := SBC.SyncGetLatestBlocks()[0].Header.Hash
+		currentHeight := SBC.SyncGetLatestBlocks()[0].Header.Height
+		checkHeight = currentHeight
 
-		for !CheckProofOfWork(pow) {
-			nonce, _ := RandomHex()
-			result := sha3.Sum256([]byte(parentHash + nonce + mptRootHash))
-			pow = hex.EncodeToString(result[:])
+		//create a starting pow to try
+		y := sha3.Sum256([]byte(parentHash + nonce + mptRootHash))
+		pow := hex.EncodeToString(y[:])
+
+		for !CheckProofOfWork(pow) && checkHeight == currentHeight {
+			nonce, _ = RandomHex()
+			newY := sha3.Sum256([]byte(parentHash + nonce + mptRootHash))
+			pow = hex.EncodeToString(newY[:])
+			checkHeight = SBC.SyncGetLatestBlocks()[0].Header.Height
 		}
-		return true
+
+		if checkHeight != currentHeight {
+			fmt.Println("\nSomeone else found the block!!")
+			fmt.Println("Current Height:", currentHeight)
+			fmt.Println("New Height:", checkHeight)
+			fmt.Println()
+		}
+
+		//If we solved PoW and no one else has added a new block
+			//return the nonce
+		if CheckProofOfWork(pow) && checkHeight == currentHeight {
+			fmt.Println("Found:", pow)
+			fmt.Println("Nonce:", nonce)
+			fmt.Println("Solved PoW")
+			return nonce
+		}
 	}
-	return false
+	return ""
 }
 
 
