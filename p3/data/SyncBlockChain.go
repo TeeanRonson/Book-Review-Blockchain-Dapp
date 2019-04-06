@@ -59,7 +59,6 @@ func(sbc *SyncBlockChain) GetBlock(height int32, hash string) p2.Block {
 			return block
 		}
 	}
-	fmt.Println("Returning the dummy block")
 	return dummy
 }
 

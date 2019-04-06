@@ -5,6 +5,7 @@ import (
     "encoding/hex"
     "encoding/json"
     "fmt"
+    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
     "golang.org/x/crypto/sha3"
@@ -55,7 +56,7 @@ func RandomHex() (string, error) {
 /**
 Decode the JsonString into HeartBeatData
  */
-func decodeJsonToHbdMod(hbd string) data.HeartBeatData {
+func decodeJsonToHbd(hbd string) data.HeartBeatData {
 
     recvHeartBeatData := data.HeartBeatData{}
     if err := json.Unmarshal([]byte(hbd), &recvHeartBeatData); err != nil {
@@ -106,5 +107,24 @@ func verifyProofOfWork(newBlock p2.Block) bool {
    result := sha3.Sum256([]byte(newBlock.Header.ParentHash + newBlock.Header.Nonce + newBlock.Mpt.Root))
 
    return CheckProofOfWork(hex.EncodeToString(result[:]))
-
 }
+
+func GetY(parentHash string, nonce string, mptRootHash string) string {
+    y := sha3.Sum256([]byte(parentHash + nonce + mptRootHash))
+    pow := hex.EncodeToString(y[:])
+    return pow
+}
+
+/**
+Get the height of the blockChain
+ */
+func GetHeight() int32 {
+    return SBC.SyncGetLatestBlocks()[0].Header.Height
+}
+
+/**
+Get all the new data for this block
+ */
+ func FetchMptData() p1.MerklePatriciaTrie {
+     return p1.GetMPTrie()
+ }

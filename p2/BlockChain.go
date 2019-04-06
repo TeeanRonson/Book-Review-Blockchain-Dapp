@@ -75,7 +75,7 @@ we ignore it because we don't store duplicate blocks; if not, insert the block i
 func (bc *BlockChain) Insert(block Block) {
 
 	currChain := bc.Get(block.Header.Height)
-	fmt.Println("\nInsert New Block into block chain")
+	fmt.Println("\nInsert New Block into block chain:", block)
 
 	if currChain == nil {
 		//fmt.Println("No []Block at that height: append to Block height:", block.Header.Height)

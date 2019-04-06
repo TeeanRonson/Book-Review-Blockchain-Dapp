@@ -28,32 +28,26 @@ if yes, do:
 (1) Randomly create an MPT.
 (2) Generate the next block.
 (3) Create a HeartBeatData, add that new block, and return.
- */
-//func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString string, addr string) HeartBeatData {
-//
-//	//create a new block
-//	if rand.Intn(100) < 50 {
-//		mpt := p1.GetMPTrie()
-//		block := sbc.GenBlock(mpt)
-//		blockJson, err := block.EncodeToJson()
-//		if err != nil {
-//			fmt.Println("Error in PrepareHeartBeatData")
-//			panic(err)
-//		}
-//		fmt.Println("We created a block!")
-//		return HeartBeatData{true, selfId, blockJson, peerMapJsonString, addr, 3}
-//	} else { //don't create a new block
-//		fmt.Println("We are not creating a block!")
-//		return HeartBeatData{false, selfId, "", peerMapJsonString, addr, 3}
-//	}
-//}
+*/
+func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString map[string]int32, addr string) HeartBeatData {
+
+	//mpt := p1.GetMPTrie()
+	//block := sbc.GenBlock(mpt)
+	//blockJson, err := block.EncodeToJson()
+	//if err != nil {
+	//	fmt.Println("Error in PrepareHeartBeatData")
+	//	panic(err)
+	//}
+	fmt.Println("2. We created HeartBeat!")
+	return HeartBeatData{false, selfId, "", peerMapJsonString, addr, 3}
+}
 
 /**
 Use the mpt argument to create a new block
 Update the block.Header.nonce to the input nonce argument
 Create a HeartBeatData and return
  */
-func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString map[string]int32, addr string, mpt p1.MerklePatriciaTrie, nonce string) HeartBeatData {
+func PrepareHeartBeatDataWithBlock(sbc *SyncBlockChain, selfId int32, peerMapJsonString map[string]int32, addr string, mpt p1.MerklePatriciaTrie, nonce string) HeartBeatData {
 
 	block := sbc.GenBlock(mpt)
 	block.Header.Nonce = nonce
