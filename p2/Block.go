@@ -114,6 +114,13 @@ func (b *Block) EncodeToJson() (string, error) {
     return string(jsonFormatted), nil
 }
 
+/**
+Compress the block to show subset of information
+ */
+func (b *Block) CompressBlock() string {
+    return "height=" + int32ToString(b.Header.Height) + ", timestamp=" + int64ToString(b.Header.Timestamp) +  ", hash=" + b.Header.Hash + ", parentHash=" + b.Header.ParentHash + ", size=" + int32ToString(b.Header.Size)
+}
+
 
 
 

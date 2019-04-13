@@ -145,3 +145,28 @@ Show the block chain
 func(sbc *SyncBlockChain) Show() string {
 	return sbc.bc.Show()
 }
+
+/**
+Show the Canonical chain
+ */
+func(sbc *SyncBlockChain) Canonical() string {
+
+	fmt.Println()
+	fmt.Println("Canonical!! -------------")
+	canonical := ""
+	for _, block := range sbc.SyncGetLatestBlocks() {
+		dummy := block
+		canonical += "\n"
+		for dummy.Header.Height >= 1 {
+			blockString := dummy.CompressBlock()
+			fmt.Println("THE BLOCK HERE IS: ----------------- ", blockString)
+			canonical += blockString + "\n"
+			parent := sbc.SyncGetParentBlock(dummy)
+			fmt.Println("PARENT BLOCK IS: ------------ ", parent.CompressBlock())
+			dummy = parent
+			fmt.Println("DUMMY BLOCK IS: ------------ ", dummy.CompressBlock())
+		}
+		fmt.Println("OUT OF LOOP")
+	}
+	return canonical
+}

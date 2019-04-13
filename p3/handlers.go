@@ -82,7 +82,8 @@ This function prints the current canonical chain, and chains of all forks if the
 Note that all forks should end at the same height (otherwise there wouldn't be a fork).
  */
 func Canonical(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintf(w, "%s", SBC.Show())
+
+	_, _ = fmt.Fprintf(w, "%s", SBC.Canonical())
 }
 
 /**
