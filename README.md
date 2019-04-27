@@ -9,6 +9,10 @@ Research reveals that 93 percent of shoppers say the testimonials they read affe
 ## Why do we need blockchain for this application?
 The main advantage blockchain technology brings to this application is immutability. A user that posts a review and rating to the application will have to sign it with his/her private key signature and this is locked into the blockchain. 
 
+```
+{"asd":Hello}
+
+```
 It is immutable so that no actors can change their previously proposed book review and rating.
 
 What are the list of functionalities?
