@@ -35,17 +35,19 @@ GET /createBookReview
 
 #### Allows a client to post a new book review onto the Book Review Application
 ##### Implementation details
-- MPT
-<key> = bookId
-<value> = bookReview JSON element 
+- MPT: 
+key = bookId
+value = bookReview JSON element 
  
 - title: User generated content
 - bookId: Generate new bookId for each new book added into blockchain (endpoint)
 - description: User generated content
 - reviewText: User generated content
 - reviewRating: User generated content <Value from 0-5>
-- transactionfee: User generated content
+- transactionFee: User generated content
 - signature: Generate new signature key for client (endpoint)
+
+
 
 ```
 POST /newBookReview
@@ -67,9 +69,11 @@ Content-type: application/json
 GET /newBookId
 
 ```
+#### Allows a client to generate a new key signature
+```
+GET /newBookId
 
-
-
+```
 
 
 ## Define the success of this product?
@@ -98,8 +102,3 @@ The implementation of the underlying blockchain is simplified to fit the nature 
 1. Client that posts a new book review owns sufficient transaction fees 
 2. New book review is an actual book
 3. Client that posts a new book has registered with the application and the reviewerName has been saved. 
-
-
-
-
-
