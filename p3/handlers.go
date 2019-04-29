@@ -325,6 +325,9 @@ If the nonce failed the verification, increment it by 1 and try the next nonce.
 */
 func StartTryingNonces() {
 
+	//Start trying nonces only if mpt is not empty?
+	//create a new mpt everytime after we receive new book review applications
+
 	var checkHeight int32
 	selfAddr := os.Args[1]
 

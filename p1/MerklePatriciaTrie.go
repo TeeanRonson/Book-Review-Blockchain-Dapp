@@ -25,7 +25,9 @@ type MerklePatriciaTrie struct {
 	Root   string
 }
 
-
+/**
+Helper function for Get method
+ */
 func (mpt *MerklePatriciaTrie) GetHelper2(node string, path []uint8, position int) string {
 
 	currNode := mpt.db[node]
