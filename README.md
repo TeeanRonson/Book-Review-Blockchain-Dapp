@@ -23,22 +23,29 @@ The main advantage blockchain technology brings to this application is immutabil
 ## What are the list of functionalities?
 
 #### Allows a client to retrieve all book reviews that exist on the Book Review Application
-Implementation details
-
 ```
 GET /allBookReviews
+
 ```
 
 #### Takes the client to the page where a new book review can be created 
-Implementation details
-
 ```
 GET /createBookReview
 ```
 
 #### Allows a client to post a new book review onto the Book Review Application
-Implementation details
-
+##### Implementation details
+- MPT
+<key> = bookId
+<value> = bookReview JSON element 
+ 
+- title: User generated content
+- bookId: Generate new bookId for each new book added into blockchain (endpoint)
+- description: User generated content
+- reviewText: User generated content
+- reviewRating: User generated content <Value from 0-5>
+- transactionfee: User generated content
+- signature: Generate new signature key for client (endpoint)
 
 ```
 POST /newBookReview
@@ -46,7 +53,7 @@ Content-type: application/json
 
 {"title": string,
 "bookId": int,
-"description”": string,
+"description": string,
 "reviewText": string,
 "reviewRating": int,
 "reviewerName": string,
@@ -55,26 +62,42 @@ Content-type: application/json
 }
 ```
 
+#### Allows a client to generate a new book Id
+```
+GET /newBookId
+
+```
+
+
+
+
+
 ## Define the success of this product?
  - [ ] Users will be able to post new reviews to the application 
  - [ ] Users will be able to view all reviewed books on the platform
 
 ## Midpoint Task List
- [ ] Set up new data structures 
- [ ] POST newBookReview
- [ ] GET allBookReviews
+ - [x] Set up new data structures 
+ - [x] POST newBookReview endpoint
+ - [x] GET allBookReviews endpoint
+ - [x] GET createBookReview endpoint
 
 ## Final Deadline Task List
- [ ] NewBookReview FrontEnd 
- [ ] AllBookReviews FrontEnd
- [ ] Public Private Key generation for clients
- [ ] Workflow logic for POST /newBookReview
- [ ] Workflow logic for GET /alllBooksReviews
- [ ] Miner wallet to store transaction fees 
+ - [ ] NewBookReview FrontEnd 
+ - [ ] AllBookReviews FrontEnd
+ - [ ] Public Private Key generation for clients
+ - [ ] Workflow logic for POST /newBookReview
+ - [ ] Workflow logic for GET /allBookReviews
+ - [ ] Workflow logic for GET /createBookReview
+ - [ ] Miner wallet to store transaction fees 
 
 ## Disclaimer 
 This project is an academic level abstract of an actual decentralized application on the public blockchain. 
 The implementation of the underlying blockchain is simplified to fit the nature of this project, and several assumptions have been made about transactions to allow the project to work seamlessly. 
+
+1. Client that posts a new book review owns sufficient transaction fees 
+2. New book review is an actual book
+3. Client that posts a new book has registered with the application and the reviewerName has been saved. 
 
 
 
