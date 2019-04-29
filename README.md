@@ -56,8 +56,8 @@ Content-type: application/json
 ```
 
 ## Define the success of this product?
- [ ] Users will be able to post new reviews to the application 
- [ ] Users will be able to view all reviewed books on the platform
+ - [ ] Users will be able to post new reviews to the application 
+ - [ ] Users will be able to view all reviewed books on the platform
 
 ## Midpoint Task List
  [ ] Set up new data structures 
