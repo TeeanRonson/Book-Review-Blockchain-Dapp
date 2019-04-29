@@ -56,21 +56,21 @@ Content-type: application/json
 ```
 
 ## Define the success of this product?
-[ ] Users will be able to post new reviews to the application 
-[ ] Users will be able to view all reviewed books on the platform
+ [ ] Users will be able to post new reviews to the application 
+ [ ] Users will be able to view all reviewed books on the platform
 
 ## Midpoint Task List
-[ ] Set up new data structures 
-[ ] POST newBookReview
-[ ] GET allBookReviews
+ [ ] Set up new data structures 
+ [ ] POST newBookReview
+ [ ] GET allBookReviews
 
 ## Final Deadline Task List
-[ ] NewBookReview FrontEnd 
-[ ] AllBookReviews FrontEnd
-[ ] Public Private Key generation for clients
-[ ] Workflow logic for POST /newBookReview
-[ ] Workflow logic for GET /alllBooksReviews
-[ ] Miner wallet to store transaction fees 
+ [ ] NewBookReview FrontEnd 
+ [ ] AllBookReviews FrontEnd
+ [ ] Public Private Key generation for clients
+ [ ] Workflow logic for POST /newBookReview
+ [ ] Workflow logic for GET /alllBooksReviews
+ [ ] Miner wallet to store transaction fees 
 
 ## Disclaimer 
 This project is an academic level abstract of an actual decentralized application on the public blockchain. 
