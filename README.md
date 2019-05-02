@@ -82,7 +82,7 @@ Struct bookReviewWithId
 }
 ```
 
-- MPT: <key> = bookTitle: <value> = bookReview JSON element 
+- MPT: key = bookTitle; value = bookReview JSON element 
  
 - title: User generated content
 - reviewText: User generated content
