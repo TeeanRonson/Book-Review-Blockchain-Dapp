@@ -39,7 +39,7 @@ func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString m
 	//	panic(err)
 	//}
 	fmt.Println("2. We created HeartBeat!")
-	return HeartBeatData{false, selfId, "", peerMapJsonString, addr, 3}
+	return HeartBeatData{false, selfId, ""	, peerMapJsonString, addr, 3}
 }
 
 /**
