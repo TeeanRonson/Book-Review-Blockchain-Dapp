@@ -65,7 +65,7 @@ i.e. after it has already downloaded the block chain
  */
 func Init() {
 	SBC = data.NewBlockChain()
-	Peers = data.NewPeerList(convertToInt32(os.Args[1]), 32)
+	Peers = data.NewPeerList(ConvertToInt32(os.Args[1]), 32)
 	ifStarted = false
 }
 
@@ -111,7 +111,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	if ifStarted {
 		senderId := r.URL.Query()["id"][0]
 		//Add remote peer into PeerMap
-		Peers.Add(senderId, convertToInt32(senderId))
+		Peers.Add(senderId, ConvertToInt32(senderId))
 
 		//Return the BlockChain's JSON
 		blockChainJson, err := SBC.BlockChainToJson()
@@ -144,7 +144,7 @@ func UploadBlock(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		theBlock = SBC.GetBlock(convertToInt32(height), targetHash)
+		theBlock = SBC.GetBlock(ConvertToInt32(height), targetHash)
 
 		//Check if block is valid
 		if theBlock.Header.Size == 0 {
@@ -225,7 +225,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		//Convert Json into HeartBeatData
-		hbd := decodeJsonToHbd(string(body))
+		hbd := DecodeJsonToHbd(string(body))
 		Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
 
 		//TODO: Remove
@@ -240,7 +240,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 			//Get the new block
 			recvBlock, _ := p2.DecodeFromJson(hbd.BlockJson)
 
-			if verifyProofOfWork(recvBlock) {
+			if VerifyProofOfWork(recvBlock) {
 				fmt.Println("Verified Proof Of Work of Received block")
 				currBlock := recvBlock
 				//keep asking for the parent block until we have them all
@@ -259,7 +259,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("Latest block inserted successfully:", recvBlock)
 				hbd.Hops = hbd.Hops - 1
 				hbd.Addr = os.Args[1]
-				hbd.Id = convertToInt32(os.Args[1])
+				hbd.Id = ConvertToInt32(os.Args[1])
 				if hbd.Hops > 0 {
 					ForwardHeartBeat(hbd)
 				}
@@ -277,7 +277,7 @@ func askForBlock(height int32, hash string) p2.Block {
 
 	if ifStarted {
 		for addr, _ := range Peers.Copy() {
-			endPoint := HTTPLOCALHOST + addr + "/block/" + int32ToString(height) + "/"+ hash
+			endPoint := HTTPLOCALHOST + addr + "/block/" + Int32ToString(height) + "/"+ hash
 			fmt.Println("EndPoint in AskforBlock:", endPoint)
 
 			resp, err := http.Get(endPoint)

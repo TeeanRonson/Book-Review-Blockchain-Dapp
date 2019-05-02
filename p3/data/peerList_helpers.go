@@ -2,7 +2,7 @@ package data
 
 import "sort"
 
-// A data structure to hold key/value pairs
+// A nodeData structure to hold key/value pairs
 //type Pair struct {
 //    Key   string
 //    Value int32

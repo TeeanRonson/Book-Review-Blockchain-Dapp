@@ -1,4 +1,4 @@
-package data
+package nodeData
 
 type ReviewData struct {
     Title string        `json:"title"`

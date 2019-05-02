@@ -13,7 +13,7 @@ import (
     "strconv"
 )
 
-func convertToInt32(value string) int32 {
+func ConvertToInt32(value string) int32 {
 
     i, err := strconv.ParseInt(value, 10, 64)
     if err != nil {
@@ -23,7 +23,7 @@ func convertToInt32(value string) int32 {
     return int32(i)
 }
 
-func int32ToString(n int32) string {
+func Int32ToString(n int32) string {
     buf := [11]byte{}
     pos := len(buf)
     i := int64(n)
@@ -56,7 +56,7 @@ func RandomHex() (string, error) {
 /**
 Decode the JsonString into HeartBeatData
  */
-func decodeJsonToHbd(hbd string) data.HeartBeatData {
+func DecodeJsonToHbd(hbd string) data.HeartBeatData {
 
     recvHeartBeatData := data.HeartBeatData{}
     if err := json.Unmarshal([]byte(hbd), &recvHeartBeatData); err != nil {
@@ -102,7 +102,7 @@ func ProofOfWorkTest(parentHash string, mptRootHash string) bool {
 /**
 Verify that the SHA3(parentHash + nonce + mptRootHash) value precedes with 4 0's
  */
-func verifyProofOfWork(newBlock p2.Block) bool {
+func VerifyProofOfWork(newBlock p2.Block) bool {
 
    result := sha3.Sum256([]byte(newBlock.Header.ParentHash + newBlock.Header.Nonce + newBlock.Mpt.Root))
 
@@ -123,7 +123,7 @@ func GetHeight() int32 {
 }
 
 /**
-Get all the new data for this block
+Get all the new nodeData for this block
  */
  func FetchMptData() p1.MerklePatriciaTrie {
      return p1.GetMPTrie()

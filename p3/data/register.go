@@ -18,7 +18,7 @@ func NewRegisterData(id int32, peerMapJson string) RegisterData {
 }
 
 /**
-Encode the Register data into Json Format
+Encode the Register nodeData into Json Format
  */
 func (data *RegisterData) EncodeToJson() (string, error) {
 
