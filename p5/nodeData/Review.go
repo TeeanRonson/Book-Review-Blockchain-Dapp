@@ -10,6 +10,13 @@ type ReviewData struct {
     BookId int32        `json:"bookId"`
 }
 
+type ReviewObject struct {
+    Title string `json:"title"`
+    ReviewText string `json:"reviewText"`
+    ReviewRating string `json:"reviewRating"`
+    BookId int32 `json:"bookId"`
+}
+
 /**
 Prepare a new Review Data object
  */

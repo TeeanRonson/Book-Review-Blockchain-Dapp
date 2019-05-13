@@ -12,7 +12,7 @@ func main() {
 
 	router := p3.NewRouter()
 	if len(os.Args) > 1 {
-	fmt.Println("Here with", os.Args[1], os.Args[2])
+		fmt.Println("Here with", os.Args[1], os.Args[2])
 		log.Fatal(http.ListenAndServe(":" + os.Args[1], router))
 	} else {
 		log.Fatal(http.ListenAndServe(":6686", router))

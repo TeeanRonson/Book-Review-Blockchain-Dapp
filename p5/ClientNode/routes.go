@@ -48,22 +48,15 @@ var routes = Routes{
         GetAllBookReviews,
     },
     Route{
-        "AllBookReviews",
-        "GET",
-        "/getAllBookReviews",
-        GetAllBookReviews,
-    },
-    Route{
         "NewBookReview",
         "POST",
         "/newBookReview",
         NewBookReview,
     },
     Route{
-        "CreateBookReview",
+        "NewBookReview",
         "GET",
-        "/createBookReview",
-        CreateBookReview,
+        "/newBookReview",
+        NewBookReview,
     },
-
 }

@@ -170,27 +170,27 @@ func (bc *BlockChain) Show() string {
 	return rs
 }
 
-/**
-Print the Canonical chain and any other forks from the chain
- */
-func (bc *BlockChain) Canonical() string {
-
-	fmt.Println()
-	fmt.Println("Canonical!! -------------")
-	canonical := ""
-	for _, block := range bc.Chain[bc.Length] {
-		dummy := block
-		canonical += "\n"
-		for dummy.Header.Height >= 1 {
-			blockString := dummy.CompressBlock()
-			fmt.Println("THE BLOCK HERE IS: ----------------- ", blockString)
-			canonical += blockString + "\n"
-			parent := bc.GetParentBlock(dummy)
-			fmt.Println("PARENT BLOCK IS: ------------ ", parent.CompressBlock())
-			dummy = parent
-			fmt.Println("DUMMY BLOCK IS: ------------ ", dummy.CompressBlock())
-		}
-		fmt.Println("OUT OF LOOP")
-	}
-	return canonical
-}
+///**
+//Print the Canonical chain and any other forks from the chain
+// */
+//func (bc *BlockChain) Canonical() string {
+//
+//	fmt.Println()
+//	fmt.Println("Canonical!! -------------")
+//	canonical := ""
+//	for _, block := range bc.Chain[bc.Length] {
+//		dummy := block
+//		canonical += "\n"
+//		for dummy.Header.Height >= 1 {
+//			blockString := dummy.CompressBlock()
+//			fmt.Println("THE BLOCK HERE IS: ----------------- ", blockString)
+//			canonical += blockString + "\n"
+//			parent := bc.GetParentBlock(dummy)
+//			fmt.Println("PARENT BLOCK IS: ------------ ", parent.CompressBlock())
+//			dummy = parent
+//			fmt.Println("DUMMY BLOCK IS: ------------ ", dummy.CompressBlock())
+//		}
+//		fmt.Println("OUT OF LOOP")
+//	}
+//	return canonical
+//}

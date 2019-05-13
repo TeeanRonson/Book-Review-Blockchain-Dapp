@@ -5,8 +5,9 @@ import (
     "fmt"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3"
-    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/nodeData"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
+    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/nodeData"
+    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/FrontEnd"
     "io/ioutil"
     "log"
     "net/http"
@@ -41,6 +42,7 @@ func Start(w http.ResponseWriter, r *http.Request) {
 
     fmt.Println("Fetching the blockchain")
     Download()
+    nodeData.NewBookDatabase()
     go StartHeartBeat()
 
 }
@@ -75,31 +77,66 @@ func Canonical(w http.ResponseWriter, r *http.Request) {
 
 /**
 Get all book reviews
+
+For each and every book review that has been published onto the block chain
+List all reviews in order of latest to oldest
  */
 func GetAllBookReviews(w http.ResponseWriter, r *http.Request) {
 
-
-
+    _, _ = fmt.Fprintf(w, "%s", SBC.GetAllReviews())
 }
 
 /**
 New Book Review
+
+Step 1: Check authenticity and integrity of new Book Review with Sha256 Hash Function
+
+A new book review can be created which creates a new Review Object
+ClientNode
+1. Send the new Review object to all Miners in the PeerList
+2. Redirect user to page with all the book reviews
+
+Miner
+1. Receive the new HeartBeatData and begin ProofOfWork
+2. If it manages to solve the ProofOfWork and produce a new block
+3. Add transaction fee to the wallet of the Node
+4. Propagate the new block to all other users
  */
 func NewBookReview(w http.ResponseWriter, r *http.Request) {
 
+    if r.URL.Path != "/newBookReview" {
+       http.Error(w, "404 not found.", http.StatusNotFound)
+       return
+    }
 
+    switch r.Method {
+    case "GET":
+
+        _, _ = fmt.Fprintf(w, "%s", FrontEnd.WriteANewBookReview())
+    case "POST":
+        fmt.Println("NEW POST REQUEST")
+        // Call ParseForm() to parse the raw query and update r.PostForm and r.Form.
+       if err := r.ParseForm(); err != nil {
+           _, _ = fmt.Fprintf(w, "ParseForm() err: %v", err)
+           return
+       }
+       //_, _ = fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
+        title := r.FormValue("title")
+        reviewText := r.FormValue("reviewText")
+        rating := r.FormValue("rating")
+        //txfee := r.FormValue("txfee")
+        //pubkey := r.FormValue("pubkey")
+        sign := r.FormValue("sign")
+        BookDatabase.AddBook(title)
+
+
+        _, _ = fmt.Fprintf(w, "%s", FrontEnd.Confirmation(title, reviewText, rating, sign))
+
+    default:
+       _, _ = fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+    }
 
 }
-
-/**
-New Book Review
- */
-func CreateBookReview(w http.ResponseWriter, r *http.Request) {
-
-
-
-}
-
 
 /**
 Download the current BlockChain from the primary(leader) node
