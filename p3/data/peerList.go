@@ -19,7 +19,6 @@ type PeerList struct {
 type SinglePeer struct {
 	peerAdd string
 	peerId int32
-
 }
 
 /**

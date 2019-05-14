@@ -26,7 +26,7 @@ var HTTPLOCALHOST = HTTP + LOCAL_HOST
 
 var SBC data.SyncBlockChain
 var Peers data.PeerList
-
+var ifStarted bool
 
 /**
 Register ID, download BlockChain, start HeartBeat
@@ -39,12 +39,16 @@ else it will get an ID, then Download() the block chain from the primary node
 func Start(w http.ResponseWriter, r *http.Request) {
 
     Init()
+    //fmt.Println("Fetching the blockchain")
+    //Download()
 
-    fmt.Println("Fetching the blockchain")
-    Download()
-    nodeData.NewBookDatabase()
-    go StartHeartBeat()
-
+    ifStarted = true
+    //go StartHeartBeat()
+    _, err := fmt.Fprint(w, "ifStarted: ", ifStarted)
+    if err != nil {
+        fmt.Println("Could not start node")
+        panic(err)
+    }
 }
 
 /**
@@ -53,8 +57,10 @@ ifStarted indicates if the block can start sending and receiving blocks
 i.e. after it has already downloaded the block chain
  */
 func Init() {
-    p3.SBC = data.NewBlockChain()
-    p3.Peers = data.NewPeerList(p3.ConvertToInt32(os.Args[1]), 32)
+    SBC = data.NewBlockChain()
+    Peers = data.NewPeerList(p3.ConvertToInt32(os.Args[1]), 32)
+    BookDatabase = nodeData.NewBookDatabase()
+    ifStarted = false
 }
 
 
@@ -71,7 +77,6 @@ This function prints the current canonical chain, and chains of all forks if the
 Note that all forks should end at the same height (otherwise there wouldn't be a fork).
  */
 func Canonical(w http.ResponseWriter, r *http.Request) {
-
     _, _ = fmt.Fprintf(w, "%s", SBC.Canonical())
 }
 
@@ -82,7 +87,6 @@ For each and every book review that has been published onto the block chain
 List all reviews in order of latest to oldest
  */
 func GetAllBookReviews(w http.ResponseWriter, r *http.Request) {
-
     _, _ = fmt.Fprintf(w, "%s", SBC.GetAllReviews())
 }
 
@@ -111,7 +115,7 @@ func NewBookReview(w http.ResponseWriter, r *http.Request) {
 
     switch r.Method {
     case "GET":
-
+        fmt.Println("NEW GET REQUEST")
         _, _ = fmt.Fprintf(w, "%s", FrontEnd.WriteANewBookReview())
     case "POST":
         fmt.Println("NEW POST REQUEST")
@@ -120,20 +124,75 @@ func NewBookReview(w http.ResponseWriter, r *http.Request) {
            _, _ = fmt.Fprintf(w, "ParseForm() err: %v", err)
            return
        }
-       //_, _ = fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
         title := r.FormValue("title")
         reviewText := r.FormValue("reviewText")
         rating := r.FormValue("rating")
-        //txfee := r.FormValue("txfee")
-        //pubkey := r.FormValue("pubkey")
-        sign := r.FormValue("sign")
-        BookDatabase.AddBook(title)
-
-
-        _, _ = fmt.Fprintf(w, "%s", FrontEnd.Confirmation(title, reviewText, rating, sign))
+        txFee := r.FormValue("txFee")
+        pubKey := r.FormValue("pubKey")
+        priKey := r.FormValue("priKey")
+        id := BookDatabase.AddBook(title)
+        reviewObject := nodeData.PrepareReviewObject(title, reviewText, p3.ConvertToInt32(rating), ConvertToFloat32(txFee), pubKey, priKey, id)
+        fmt.Println("Review Data:", reviewObject)
+        //send reviewData to all nodes
+        ForwardReviewData(reviewObject)
+        _, _ = fmt.Fprintf(w, "%s", FrontEnd.Confirmation(title, reviewText, rating, reviewObject.Signature))
 
     default:
        _, _ = fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+    }
+}
+
+/**
+Forward the ReviewData to all peers in local PeerMap.
+ */
+func ForwardReviewData(reviewObject nodeData.ReviewObject) {
+
+    fmt.Println("-- ForwardingReviewData")
+    jsonFormatted, err := json.MarshalIndent(reviewObject, "", "")
+    if err != nil {
+        fmt.Println("Error in ForwardReviewData")
+    }
+    fmt.Println(jsonFormatted)
+
+    for addr, _ := range Peers.Copy() {
+        recipient := HTTPLOCALHOST + addr + "/reviewObject/receive"
+        fmt.Println("The recipient is:", recipient)
+        //send HeartBeatData to all peers in the local PeerMap
+        _, err := http.Post(recipient, "application/json; charset=UTF-8", strings.NewReader(string(jsonFormatted)))
+        if err != nil {
+            fmt.Println("Can't send out ReviewData")
+        }
+    }
+}
+
+
+/**
+/reviewObject/receive
+Method: POST
+Description: Receive a reviewData from a client Node.
+Check the validity of the reviewData:
+(1) Check if Sha256(jsonString) == Sent Hash
+(1a) Add the reviewData into MPT: key = bookTitle, value = jsonReviewData
+(2) Forward reviewData on to PeerList
+(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
+ */
+func ReviewObjectReceive(w http.ResponseWriter, r *http.Request) {
+
+    body, err := ioutil.ReadAll(r.Body)
+    defer r.Body.Close()
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
+    //Convert Json into ReviewData
+    reviewObject := DecodeJsonToReviewObject(string(body))
+
+    if VerifySignature(reviewObject) {
+        fmt.Println("Verified Signature of recipient")
+
+        //add data into MPT
+        reviewData, _ := DecodeJsonToReviewData(reviewObject.Data)
+        fmt.Println("Data we have:", reviewData)
     }
 
 }
@@ -286,7 +345,6 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
             }
         }
     }
-
 }
 
 /**

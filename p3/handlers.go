@@ -6,6 +6,7 @@ import (
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
+	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/nodeData"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,6 +27,7 @@ var HTTPLOCALHOST = HTTP + LOCAL_HOST
 
 var SBC data.SyncBlockChain
 var Peers data.PeerList
+var BookDatabase nodeData.BookDatabase
 var ifStarted bool
 
 
@@ -66,6 +68,7 @@ i.e. after it has already downloaded the block chain
 func Init() {
 	SBC = data.NewBlockChain()
 	Peers = data.NewPeerList(ConvertToInt32(os.Args[1]), 32)
+	BookDatabase = nodeData.NewBookDatabase()
 	ifStarted = false
 }
 
@@ -119,7 +122,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Upload Endpoint error")
 			panic(err)
 		}
-		fmt.Fprint(w, blockChainJson)
+		_, _ = fmt.Fprint(w, blockChainJson)
 	}
 }
 

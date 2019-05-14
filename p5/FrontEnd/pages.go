@@ -1,5 +1,7 @@
 package FrontEnd
 
+import "os"
+
 //var bookReviewsHead =  "<h2>Reviews</h2>\n" +
 //    "\n" +
 //    "<table>\n" +
@@ -29,9 +31,9 @@ func CreateBookReview() string {
         "Title:<br/>\n" + "<input type=\"text\" name=\"title\"/>\n" + "<br/>\n" +
         "Review:<br/>\n" + "<input type=\"text\" name=\"reviewText\"/>\n" + "<br/>\n" +
         "Rating:<br/>\n" + "<input type=\"text\" name=\"rating\"/>\n" + "<br/>\n" +
-        "Transaction Fee:<br/>\n" + "<input type=\"text\" name=\"txfee\"/>\n" + "<br/>\n" +
-        "Public Key:<br/>\n" + "<input type=\"text\" name=\"pubkey\"/>\n" + "<br/>\n" +
-        "Signature:<br/>\n" + "<input type=\"text\" name=\"sign\"/>\n" + "<br/>\n" +
+        "Transaction Fee:<br/>\n" + "<input type=\"text\" name=\"txFee\"/>\n" + "<br/>\n" +
+        "Public Key:<br/>\n" + "<input type=\"text\" name=\"pubKey\" value=\"" + os.Args[1] + "\"/>\n" + "<br/>\n" +
+        "Private Key:<br/>\n" + "<input type=\"text\" name=\"priKey\"/>\n" + "<br/>\n" +
         "<input type=\"submit\" value=\"Submit\"/>\n" +
         "</form>\n"
     return newBookReview
@@ -94,12 +96,7 @@ func Confirmation(title string, review string, rating string, signature string) 
     successfulPost += "Review: " + review+ "<br/>\n"
     successfulPost += "Your rating: " + rating + "<br/>\n"
     successfulPost += "Signed by: " + signature + "<br/>\n"
-    page += Header()
-    page += BookOfTheMonth()
-    page += successfulPost
-    page += CreateBookReview()
-    page += Footer()
-    page += End()
+    page += Header() + BookOfTheMonth() + successfulPost + CreateBookReview() + Footer() + End()
     return page
 }
 
@@ -108,10 +105,6 @@ Write a new book review page
  */
 func WriteANewBookReview() string {
     var page string
-    page += Header()
-    page += BookOfTheMonth()
-    page += CreateBookReview()
-    page += Footer()
-    page += End()
+    page += Header() + BookOfTheMonth() + CreateBookReview() + Footer() + End()
     return page
 }

@@ -1,6 +1,9 @@
 package nodeData
 
-import "strings"
+import (
+    "fmt"
+    "strings"
+)
 
 type BookDatabase struct {
     db map[string]int32
@@ -33,15 +36,29 @@ func (bd *BookDatabase) GetBookId(title string) int32 {
     return bd.db[title]
 }
 
-func (bd *BookDatabase) AddBook(title string) {
+func (bd *BookDatabase) AddBook(title string) int32 {
 
     titleLower := strings.ToLower(title)
-    if _, ok := bd.db[titleLower]; ok {
-        if ok == false {
-            bd.db[titleLower] = bd.total + 1
-            bd.total++
-        }
+
+    fmt.Println("book title:", titleLower)
+    fmt.Println(bd.db[titleLower])
+    id, ok := bd.db[titleLower]
+    if ok {
+        fmt.Println("Book Database0")
+        fmt.Println(bd)
+        fmt.Println(bd.total)
+        return id
+    } else {
+        bd.db[titleLower] = bd.total
+        bd.total++
+        fmt.Println("Book Database")
+        fmt.Println(bd)
+        fmt.Println(bd.total)
+        return bd.total
     }
+
+
+    return 0
 }
 
 

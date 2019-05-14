@@ -49,14 +49,20 @@ var routes = Routes{
     },
     Route{
         "NewBookReview",
-        "POST",
+        "GET",
         "/newBookReview",
         NewBookReview,
     },
     Route{
         "NewBookReview",
-        "GET",
+        "POST",
         "/newBookReview",
         NewBookReview,
+    },
+    Route{
+        "ReviewObjectReceive",
+        "POST",
+        "/reviewData/receive",
+        ReviewObjectReceive,
     },
 }
