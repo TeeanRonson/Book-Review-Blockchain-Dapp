@@ -42,7 +42,7 @@ var routes = Routes{
         Canonical,
     },
     Route{
-        "AllBookReviews",
+        "GetAllBookReviews",
         "GET",
         "/getAllBookReviews",
         GetAllBookReviews,
@@ -60,9 +60,9 @@ var routes = Routes{
         NewBookReview,
     },
     Route{
-        "ReviewObjectReceive",
-        "POST",
-        "/reviewData/receive",
-        ReviewObjectReceive,
+        "GetAllBooks",
+        "GET",
+        "/getAllBooks",
+        GetAllBooks,
     },
 }

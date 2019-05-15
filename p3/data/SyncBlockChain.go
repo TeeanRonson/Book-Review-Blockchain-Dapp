@@ -176,7 +176,5 @@ func(sbc *SyncBlockChain) Canonical() string {
 Return all the book reviews in every block of the block chain as a Json
  */
 func (sbc *SyncBlockChain) GetAllReviews() string {
-
-
 	return "These are all the book reviews"
 }

@@ -48,4 +48,16 @@ var routes = Routes{
 		"/canonical",
 		Canonical,
 	},
+	Route{
+		"ReviewObjectReceive",
+		"POST",
+		"/reviewObject/receive",
+		ReviewObjectReceive,
+	},
+	Route{
+		"ShowWallet",
+		"GET",
+		"/showWallet",
+		ShowWallet,
+	},
 }

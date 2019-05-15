@@ -8,6 +8,7 @@ import (
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
     "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3/data"
+    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/nodeData"
     "golang.org/x/crypto/sha3"
     "reflect"
     "strconv"
@@ -124,7 +125,68 @@ func GetHeight() int32 {
 
 /**
 Get all the new nodeData for this block
+
+Should we add a block size limit?
  */
- func FetchMptData() p1.MerklePatriciaTrie {
-     return p1.GetMPTrie()
+ func FetchMptData() (p1.MerklePatriciaTrie, float32, bool) {
+
+     mpt := p1.GetMPTrie()
+     txFees := float32(0)
+
+     //If TxPool is empty return true
+     if TxPool.IsEmpty() {
+         return mpt, txFees, true
+     }
+
+     for !TxPool.IsEmpty() {
+         reviewData, err := TxPool.Poll()
+         if err != nil {
+             fmt.Println(err)
+             break
+         }
+         jsonReviewData, _ := reviewData.EncodeToJson()
+         mpt.Insert(reviewData.Title, jsonReviewData)
+         txFees += reviewData.TxFee
+     }
+     return mpt, txFees, false
  }
+
+/**
+Decode the JsonString into ReviewObject
+*/
+func DecodeJsonToReviewObject(hbd string) nodeData.ReviewObject {
+
+    reviewObject := nodeData.ReviewObject{}
+    if err := json.Unmarshal([]byte(hbd), &reviewObject); err != nil {
+        fmt.Println("Can't Unmarshal in decodeReviewObject")
+        return reviewObject
+    }
+    return reviewObject
+}
+
+/**
+Decode the JsonString into ReviewData
+ */
+func DecodeJsonToReviewData(jsonString string) (nodeData.ReviewData, error) {
+
+    reviewData := nodeData.ReviewData{}
+    if err := json.Unmarshal([]byte(jsonString), &reviewData); err != nil {
+        fmt.Println("Can't Unmarshal in decodeReviewData")
+        panic(err)
+        return reviewData, err
+    }
+    return reviewData, nil
+}
+
+
+/**
+Verify the signature of the incoming ReviewObject
+
+We verify by decrypting the Object with the sender public key
+
+ */
+func VerifySignature(reviewObject nodeData.ReviewObject) bool {
+
+    hash := sha3.Sum256([]byte(reviewObject.Data))
+    return reflect.DeepEqual(reviewObject.Signature, hex.EncodeToString(hash[:]))
+}

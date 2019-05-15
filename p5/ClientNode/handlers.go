@@ -19,13 +19,13 @@ import (
 
 var FIRST_NODE = "http://localhost:6686"
 var GET_BC_FIRST_NODE = FIRST_NODE + "/upload"
-var BookDatabase nodeData.BookDatabase
 var HTTP = "http://"
 var LOCAL_HOST = "localhost:"
 var HTTPLOCALHOST = HTTP + LOCAL_HOST
 
 var SBC data.SyncBlockChain
 var Peers data.PeerList
+var BookDatabase nodeData.BookDatabase
 var ifStarted bool
 
 /**
@@ -39,11 +39,11 @@ else it will get an ID, then Download() the block chain from the primary node
 func Start(w http.ResponseWriter, r *http.Request) {
 
     Init()
-    //fmt.Println("Fetching the blockchain")
-    //Download()
+    fmt.Println("Fetching the blockchain")
+    Download()
 
     ifStarted = true
-    //go StartHeartBeat()
+    go StartHeartBeat()
     _, err := fmt.Fprint(w, "ifStarted: ", ifStarted)
     if err != nil {
         fmt.Println("Could not start node")
@@ -81,8 +81,15 @@ func Canonical(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
-Get all book reviews
+Get all books
+For each and every book that has been published onto the block chain
+*/
+func GetAllBooks(w http.ResponseWriter, r *http.Request) {
+    _, _ = fmt.Fprintf(w, "%s", BookDatabase.GetAllBooks())
+}
 
+/**
+Get all book reviews
 For each and every book review that has been published onto the block chain
 List all reviews in order of latest to oldest
  */
@@ -92,9 +99,7 @@ func GetAllBookReviews(w http.ResponseWriter, r *http.Request) {
 
 /**
 New Book Review
-
 Step 1: Check authenticity and integrity of new Book Review with Sha256 Hash Function
-
 A new book review can be created which creates a new Review Object
 ClientNode
 1. Send the new Review object to all Miners in the PeerList
@@ -165,38 +170,6 @@ func ForwardReviewData(reviewObject nodeData.ReviewObject) {
     }
 }
 
-
-/**
-/reviewObject/receive
-Method: POST
-Description: Receive a reviewData from a client Node.
-Check the validity of the reviewData:
-(1) Check if Sha256(jsonString) == Sent Hash
-(1a) Add the reviewData into MPT: key = bookTitle, value = jsonReviewData
-(2) Forward reviewData on to PeerList
-(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
- */
-func ReviewObjectReceive(w http.ResponseWriter, r *http.Request) {
-
-    body, err := ioutil.ReadAll(r.Body)
-    defer r.Body.Close()
-    if err != nil {
-        http.Error(w, err.Error(), 500)
-        return
-    }
-    //Convert Json into ReviewData
-    reviewObject := DecodeJsonToReviewObject(string(body))
-
-    if VerifySignature(reviewObject) {
-        fmt.Println("Verified Signature of recipient")
-
-        //add data into MPT
-        reviewData, _ := DecodeJsonToReviewData(reviewObject.Data)
-        fmt.Println("Data we have:", reviewData)
-    }
-
-}
-
 /**
 Download the current BlockChain from the primary(leader) node
 */
@@ -264,7 +237,7 @@ func StartHeartBeat() {
         time.Sleep(3 * time.Second)
         fmt.Println("1. HeartBeat of", os.Args[1])
         selfAddr := os.Args[1]
-        hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAddr)
+        hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), BookDatabase.Copy(), selfAddr)
         ForwardHeartBeat(hbd)
     }
 }
@@ -314,6 +287,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
     //Convert Json into HeartBeatData
     hbd := p3.DecodeJsonToHbd(string(body))
     Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
+    BookDatabase.InjectBookDatabase(hbd.BookDatabase)
 
     //if HeartBeatData has a new block
     if hbd.IfNewBlock {

@@ -191,33 +191,3 @@ func(peers *PeerList) InjectPeerMapJson(peerMap map[string]int32, senderAddr str
 	}
 	fmt.Println("My PeerMap should not contain myself:", os.Args[1], peers.peerMap)
 }
-
-
-///**
-//Inject NewPeerMap to existing PeerMap
-// */
-//func(peers *PeerList) InjectPeerMapJson(peerMapJsonStr string, senderAddr string, senderId int32) {
-//
-//	peers.mux.Lock()
-//	defer peers.mux.Unlock()
-//	newPeersList := make([]SinglePeer, 0)
-//	peers.peerMap[senderAddr] = senderId
-//
-//	for k, v := range peerMapJsonStr {
-//		fmt.Println("Key", k)
-//		fmt.Println("value", string(v))
-//	}
-//
-//	//if err := json.Unmarshal([]byte(peerMapJsonStr), &newPeersList); err != nil {
-//	//	fmt.Println("Error in InjectPeerMapJson")
-//	//	panic(err)
-//	//	return
-//	//}
-//	//add everything except yours
-//	fmt.Println("These are the peers we have received:", peerMapJsonStr)
-//	for _, item := range newPeersList {
-//		if item.peerId != peers.selfId {
-//			peers.peerMap[item.peerAdd] = item.peerId
-//		}
-//	}
-//}

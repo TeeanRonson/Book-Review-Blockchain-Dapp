@@ -28,6 +28,8 @@ var HTTPLOCALHOST = HTTP + LOCAL_HOST
 var SBC data.SyncBlockChain
 var Peers data.PeerList
 var BookDatabase nodeData.BookDatabase
+var TxPool nodeData.TxPool
+var Wallet nodeData.Wallet
 var ifStarted bool
 
 
@@ -69,6 +71,8 @@ func Init() {
 	SBC = data.NewBlockChain()
 	Peers = data.NewPeerList(ConvertToInt32(os.Args[1]), 32)
 	BookDatabase = nodeData.NewBookDatabase()
+	TxPool = nodeData.NewTxPool()
+	Wallet = nodeData.NewWallet()
 	ifStarted = false
 }
 
@@ -90,6 +94,14 @@ func Canonical(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
+Show total in Wallet
+ */
+func ShowWallet(w http.ResponseWriter, r *http.Request) {
+
+	_, _ = fmt.Fprintf(w, "%s", Wallet.ShowWallet())
+}
+
+/**
 Download the current BlockChain from the primary(leader) node
  */
 func Download() {
@@ -101,6 +113,37 @@ func Download() {
 		log.Fatal(err)
 	}
 	SBC.UpdateEntireBlockChain(string(currBlockChain))
+}
+
+/**
+/reviewObject/receive
+Method: POST
+Description: Receive a reviewData from a client Node.
+Check the validity of the reviewData:
+(1) Check if Sha256(jsonString) == Sent Hash
+(1a) Add the reviewData into TxPool
+(2) Forward reviewData on to PeerList
+(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
+ */
+func ReviewObjectReceive(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	//Convert Json into ReviewObject
+	reviewObject := DecodeJsonToReviewObject(string(body))
+
+	if VerifySignature(reviewObject) {
+		fmt.Println("Verified Signature of recipient")
+
+		//add data into txPool
+		reviewData, _ := DecodeJsonToReviewData(reviewObject.Data)
+		fmt.Println("Data we have:", reviewData)
+		TxPool.Offer(reviewData)
+	}
 }
 
 /**
@@ -181,7 +224,7 @@ func StartHeartBeat() {
 		time.Sleep(3 * time.Second)
 		fmt.Println("1. HeartBeat of", os.Args[1])
 		selfAddr := os.Args[1]
-		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAddr)
+		hbd := data.PrepareHeartBeatData(&SBC, Peers.GetSelfId(), Peers.Copy(), BookDatabase.Copy(), selfAddr)
 		ForwardHeartBeat(hbd)
 	}
 }
@@ -230,6 +273,7 @@ func HeartBeatReceive(w http.ResponseWriter, r *http.Request) {
 		//Convert Json into HeartBeatData
 		hbd := DecodeJsonToHbd(string(body))
 		Peers.InjectPeerMapJson(hbd.PeerMapJson, hbd.Addr, hbd.Id)
+		BookDatabase.InjectBookDatabase(hbd.BookDatabase)
 
 		//TODO: Remove
 		if hbd.IfNewBlock {
@@ -335,13 +379,19 @@ func StartTryingNonces() {
 	selfAddr := os.Args[1]
 
 	for true {
-		fmt.Println("TryingNoncesForNewBlock")
 		parentHash := SBC.SyncGetLatestBlocks()[0].Header.Hash
 		currentHeight := GetHeight()
 		checkHeight = currentHeight
 		nonce, _ := RandomHex()
 		//Create a new MPT
-		mpt := FetchMptData()
+		mpt, txFees, empty := FetchMptData()
+		if empty {
+			continue
+		}
+		fmt.Println("TryingNoncesForNewBlock")
+		fmt.Println("MPT:", mpt)
+		fmt.Println("TXFEES:", txFees)
+		fmt.Println("Empty:", empty)
 		y := GetY(parentHash, nonce, mpt.Root)
 
 		for !CheckProofOfWork(y) && checkHeight == currentHeight {
@@ -350,20 +400,20 @@ func StartTryingNonces() {
 			checkHeight = GetHeight()
 		}
 
-		//TODO: ERASE
+		//TODO: ERASE (If another node found the block)
 		if checkHeight != currentHeight {
 			fmt.Println("\nSomeone else found the block!!")
 			fmt.Println("Current Height:", currentHeight)
 			fmt.Println("New Height:", checkHeight)
 			fmt.Println()
 		}
+
 		//If we solved PoW and no one else has added a new block
-		//return the nonce
 		if CheckProofOfWork(y) && checkHeight == currentHeight {
 			fmt.Println("\nWe solved the block!")
 			fmt.Println("Found:", y)
 			fmt.Println("Nonce:", nonce)
-			ReadyData(nonce, selfAddr, mpt)
+			ReadyData(nonce, selfAddr, mpt, txFees)
 		}
 	}
 }
@@ -372,13 +422,14 @@ func StartTryingNonces() {
 Create a block with new nonce and new MPT
 Form a new HeartBeatData
  */
-func ReadyData(nonce string, selfAddr string, mpt p1.MerklePatriciaTrie) {
+func ReadyData(nonce string, selfAddr string, mpt p1.MerklePatriciaTrie, txFees float32) {
 
 	if reflect.DeepEqual(nonce, "") {
 		fmt.Println("NO NONCE!!!!! ")
 	}
 	fmt.Println("We found the nonce! Lets prepare the HeartBeatData: Nonce = ", nonce)
-	hbd := data.PrepareHeartBeatDataWithBlock(&SBC, Peers.GetSelfId(), Peers.Copy(), selfAddr, mpt, nonce)
+	hbd := data.PrepareHeartBeatDataWithBlock(&SBC, Peers.GetSelfId(), Peers.Copy(), BookDatabase.Copy(), selfAddr, mpt, nonce)
+	Wallet.AddFee(txFees)
 	ForwardHeartBeat(hbd)
 }
 

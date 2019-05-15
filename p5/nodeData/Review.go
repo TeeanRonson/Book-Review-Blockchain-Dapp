@@ -18,13 +18,12 @@ type ReviewData struct {
 }
 
 type ReviewObject struct {
-    Data string     `json:"data"`
+    Data string         `json:"data"`
     Signature string    `json:"signature"`
 }
 
 /**
 Prepare a new ReviewObject
-
 Review Object consist of the ReviewData and a signature of the user
  */
 func PrepareReviewObject(title string, reviewText string, reviewRating int32, txFee float32, publicKey string, priKey string, bookId int32) ReviewObject {
