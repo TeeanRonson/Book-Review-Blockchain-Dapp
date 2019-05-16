@@ -20,9 +20,9 @@ func (sbc *SyncBlockChain) GetAllReviewsHelper() string {
             fmt.Println(reviewData)
             reviews += "<tr>\n" +
                 "<td>" + key + "</td>\n" +
-                "<td>" +
-                "BookId: " + Int32ToString(reviewData.BookId) + " Review: " + reviewData.ReviewText + " Rating: " + Int32ToString(reviewData.ReviewRating) +
-                "</td>\n" +
+                "<td>" + reviewData.ReviewText +  "</td>\n" +
+                "<td>" + Int32ToString(reviewData.ReviewRating) +  "</td>\n" +
+                "<td>" + Int32ToString(reviewData.BookId) + "</td>\n" +
                 "</tr>"
         }
         parent := sbc.SyncGetParentBlock(block)

@@ -2,10 +2,13 @@ package nodeData
 
 import (
     "fmt"
+    "os"
+    "strconv"
     "strings"
     "sync"
 )
 
+var bookId int32
 type BookDatabase struct {
     db map[string]int32
     total int32
@@ -17,7 +20,18 @@ Create a new Book Database
  */
 func NewBookDatabase() BookDatabase {
     db := make(map[string]int32)
+    bookId = ConvertToInt32(os.Args[3])
     return BookDatabase{db, 0, sync.Mutex{}}
+}
+
+func ConvertToInt32(value string) int32 {
+
+    i, err := strconv.ParseInt(value, 10, 64)
+    if err != nil {
+        fmt.Println("Unable to convert string to int")
+        panic(err)
+    }
+    return int32(i)
 }
 
 /**
@@ -87,9 +101,10 @@ func (bd *BookDatabase) AddBook(title string) int32 {
         fmt.Println(bd)
         return id
     } else {
-        bd.db[titleLower] = bd.total
-        bd.total++
         fmt.Println("Book doesn't exist")
+        bd.db[titleLower] = bookId
+        bookId += 2
+        bd.total += 1
         fmt.Println(bd)
         return bd.total
     }
@@ -105,6 +120,7 @@ func (bd *BookDatabase) InjectBookDatabase(books map[string]int32) {
 
     for title, id := range books {
         bd.db[title] = id
+        bd.total++
     }
 }
 

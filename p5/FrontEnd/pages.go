@@ -12,6 +12,8 @@ func BookReviewsHead() string {
         "<tr>\n" +
         "<th>Title</th>\n" +
         "<th>Review</th>\n" +
+        "<th>Rating</th>\n" +
+        "<th>BookId</th>\n" +
         "</tr>\n"
    return bookReviewsHead
 }
