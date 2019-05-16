@@ -82,6 +82,16 @@ Struct bookReviewWithId
 "priKey": string,
 }
 ```
+
+- MPT: key = bookTitle; value = bookReview JSON
+ 
+- title: User generated content
+- reviewText: User generated content
+- reviewRating: User generated content <Value from 0-5>
+- transactionFee: User generated content
+- pubKey: Sender Address
+- priKey: Sender Username
+
 ### Miner Node
 #### Shows the all transaction fees obtained and total accumulated fees
 ```
@@ -94,16 +104,6 @@ Response: text/html
 POST /reviewObjectReceive
 Response: text/html
 ```
-
-
-- MPT: key = bookTitle; value = bookReview JSON
- 
-- title: User generated content
-- reviewText: User generated content
-- reviewRating: User generated content <Value from 0-5>
-- transactionFee: User generated content
-- pubKey: Sender Address
-- priKey: Sender Username
 
 ## Define the success of this product?
  - [x] Users will be able to post new reviews to the application 
