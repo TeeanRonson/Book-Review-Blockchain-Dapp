@@ -31,6 +31,8 @@ var BookDatabase nodeData.BookDatabase
 var TxPool nodeData.TxPool
 var Wallet nodeData.Wallet
 var ifStarted bool
+//var PrivateKey *rsa.PublicKey
+//var PublicKey *rsa.PrivateKey
 
 
 /**
@@ -74,6 +76,11 @@ func Init() {
 	TxPool = nodeData.NewTxPool()
 	Wallet = nodeData.NewWallet()
 	ifStarted = false
+	//PrivateKey, _ = rsa.GenerateKey(rand.Reader, 2048)
+	//PublicKey = PrivateKey.PublicKey
+	//fmt.Println(PrivateKey)
+	//fmt.Println(PublicKey)
+
 }
 
 /**
@@ -106,6 +113,8 @@ Download the current BlockChain from the primary(leader) node
  */
 func Download() {
 
+	//fmt.Println("My public key:", PublicKey)
+
 	resp, _ := http.Get(GET_BC_FIRST_NODE + "?id=" + os.Args[1])
 	currBlockChain, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -113,37 +122,6 @@ func Download() {
 		log.Fatal(err)
 	}
 	SBC.UpdateEntireBlockChain(string(currBlockChain))
-}
-
-/**
-/reviewObject/receive
-Method: POST
-Description: Receive a reviewData from a client Node.
-Check the validity of the reviewData:
-(1) Check if Sha256(jsonString) == Sent Hash
-(1a) Add the reviewData into TxPool
-(2) Forward reviewData on to PeerList
-(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
- */
-func ReviewObjectReceive(w http.ResponseWriter, r *http.Request) {
-
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	//Convert Json into ReviewObject
-	reviewObject := DecodeJsonToReviewObject(string(body))
-
-	if VerifySignature(reviewObject) {
-		fmt.Println("Verified Signature of recipient")
-
-		//add data into txPool
-		reviewData, _ := DecodeJsonToReviewData(reviewObject.Data)
-		fmt.Println("Data we have:", reviewData)
-		TxPool.Offer(reviewData)
-	}
 }
 
 /**
@@ -156,9 +134,11 @@ Return the BlockChain's JSON. And add the remote peer into the PeerMap.
 func Upload(w http.ResponseWriter, r *http.Request) {
 	if ifStarted {
 		senderId := r.URL.Query()["id"][0]
+		//senderKey := r.URL.Query()["key"][0]
+		//fmt.Println("senderKey:" + senderKey)
+
 		//Add remote peer into PeerMap
 		Peers.Add(senderId, ConvertToInt32(senderId))
-
 		//Return the BlockChain's JSON
 		blockChainJson, err := SBC.BlockChainToJson()
 		if err != nil {
@@ -208,6 +188,37 @@ func UploadBlock(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Uploading this block to you:", theBlockJson)
 			fmt.Fprint(w, theBlockJson)
 		}
+	}
+}
+
+/**
+/reviewObject/receive
+Method: POST
+Description: Receive a reviewData from a client Node.
+Check the validity of the reviewData:
+(1) Check if Sha256(jsonString) == Sent Hash
+(1a) Add the reviewData into TxPool
+(2) Forward reviewData on to PeerList
+(3) Subtract from HeartBeatData.hops. If hops > 0, call ForwardHeartBeat() to forward this heartBeat to all local peers.
+ */
+func ReviewObjectReceive(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	//Convert Json into ReviewObject
+	reviewObject := DecodeJsonToReviewObject(string(body))
+
+	if VerifySignature(reviewObject) {
+		fmt.Println("Verified Signature of recipient")
+
+		//add data into txPool
+		reviewData, _ := DecodeJsonToReviewData(reviewObject.Data)
+		fmt.Println("Data we have:", reviewData)
+		TxPool.Offer(reviewData)
 	}
 }
 

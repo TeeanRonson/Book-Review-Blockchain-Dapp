@@ -1,20 +1,50 @@
 package main
 
 import (
+    "crypto/rand"
+    "crypto/rsa"
+    "crypto/sha256"
     "fmt"
-    "github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p3"
-    "log"
-    "net/http"
     "os"
+    "reflect"
 )
-
 func main() {
 
-    router := p3.NewRouter()
-    if len(os.Args) > 1 {
-        fmt.Println("Here with", os.Args[1], os.Args[2])
-        log.Fatal(http.ListenAndServe(":" + os.Args[1], router))
-    } else {
-        log.Fatal(http.ListenAndServe(":6686", router))
+
+    mariaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+    if err != nil {
+        fmt.Println(err.Error)
+        os.Exit(1)
     }
+    mariaPublicKey := &mariaPrivateKey.PublicKey
+    raulPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+    if err != nil {
+        fmt.Println(err.Error)
+        os.Exit(1)
+    }
+    raulPublicKey := &raulPrivateKey.PublicKey
+
+    fmt.Println("Private Key : ", mariaPrivateKey)
+    fmt.Println(reflect.TypeOf(mariaPrivateKey))
+    fmt.Println("Public key ", mariaPublicKey)
+    fmt.Println(reflect.TypeOf(mariaPublicKey))
+    fmt.Println("Private Key : ", raulPrivateKey)
+    fmt.Println("Public key ", raulPublicKey)
+
+
+    message := []byte("the code must be like a piece of music")
+    label := []byte("")
+    hash := sha256.New()
+    cipherText, err := rsa.EncryptOAEP(
+        hash,
+        rand.Reader,
+        raulPublicKey,
+        message,
+        label,
+    )
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    fmt.Printf("OAEP encrypted [%s] to \n[%x]\n", string(message), cipherText)
 }

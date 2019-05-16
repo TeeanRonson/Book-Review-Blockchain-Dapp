@@ -191,3 +191,4 @@ func(peers *PeerList) InjectPeerMapJson(peerMap map[string]int32, senderAddr str
 	}
 	fmt.Println("My PeerMap should not contain myself:", os.Args[1], peers.peerMap)
 }
+
