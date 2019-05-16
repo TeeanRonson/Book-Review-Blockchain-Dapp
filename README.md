@@ -127,22 +127,26 @@ Response: text/html
  
  
 ## Demo 
-1. Title: Guns, Germs and Steel 
-   Review: A great read for all those interested in the gaps in power and technology between human societies.
-   Rating: 5
-   TxFee: 100
-2. Title: Principles
-   Review: A great book for wisdom in life and finance 
-   Rating: 5
-   TxFee: 60
-3. Tile: Java in 24 Hours 
-   Review: Good introduction to Java if you don't have time 
-   Rating: 3
-   TxFee: 20
-4. Title: Principles
-   Review: Great recommendation! Thanks so much 
-   Rating: 4.5
-   TxFee: 50
+1. 
+- Title: Guns, Germs and Steel 
+- Review: A great read for all those interested in the gaps in power and technology between human societies.
+- Rating: 5
+- TxFee: 100
+2. 
+- Title: Principles
+- Review: A great book for wisdom in life and finance 
+- Rating: 5
+- TxFee: 60
+3.
+- Title: Java in 24 Hours 
+- Review: Good introduction to Java if you don't have time 
+- Rating: 3
+- TxFee: 20
+4. 
+- Title: Principles
+- Review: Great recommendation! Thanks so much 
+- Rating: 4.5
+- TxFee: 50
    
 Note: ProofOfWork difficulty has been adjusted to allow quicker block generation for the demo
 
