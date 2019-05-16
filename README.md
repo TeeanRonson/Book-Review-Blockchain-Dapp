@@ -125,8 +125,26 @@ Response: text/html
  - [x] Workflow for Book Database
  - [x] Local Transaction pool 
  
-## Future work and improvements 
-- [ ] Implement RSA public & private key pair for each Node, ensures Integrity of data
+ 
+## Demo 
+1. Title: Guns, Germs and Steel 
+   Review: A great read for all those interested in the gaps in power and technology between human societies.
+   Rating: 5
+   TxFee: 100
+2. Title: Principles
+   Review: A great book for wisdom in life and finance 
+   Rating: 5
+   TxFee: 60
+3. Tile: Java in 24 Hours 
+   Review: Good introduction to Java if you don't have time 
+   Rating: 3
+   TxFee: 20
+4. Title: Principles
+   Review: Great recommendation! Thanks so much 
+   Rating: 4.5
+   TxFee: 50
+   
+Note: ProofOfWork difficulty has been adjusted to allow quicker block generation for the demo
 
 
 ## Disclaimer & Assumptions
@@ -136,3 +154,7 @@ The implementation of the underlying blockchain is simplified to fit the nature 
 1. Client that posts a new book review owns sufficient transaction fees and/or application currency
 2. New book review is assumed to be a valid book
 3. Client Nodes have all been signed up to the platform and have obtained a unique private username
+
+## Future work and improvements 
+- [ ] Implement RSA public & private key pair for each Node, ensures Integrity of data
+
