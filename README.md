@@ -1,5 +1,14 @@
 # cs686_BlockChain_P2_starter
 
+## Video Demo 
+https://youtu.be/N9dtFyJmao8 - PartI
+https://youtu.be/9hT_goqy1-E - Part II
+https://youtu.be/FerI2ydMSLA - Part III
+https://youtu.be/2ayrRr8Lups - Part IV
+
+
+
+
 ## What is the application?
 A Book review application. Allows users to post new reviews and ratings of previously read books.
 
