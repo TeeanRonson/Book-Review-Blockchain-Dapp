@@ -28,10 +28,32 @@ func (bd *BookDatabase) GetAllBooks() string {
     defer bd.mux.Unlock()
     allBooks := ""
     for key, entry := range bd.db {
-        allBooks += "BookTitle: " + key + ", BookId = " + string(entry) + "\n"
+        //fmt.Println(entry)
+        allBooks += "BookTitle: " + key + ", BookId = " + convertInt32ToString(entry) +  "\n"
     }
-    fmt.Println(allBooks)
     return allBooks
+}
+
+
+func convertInt32ToString(n int32) string {
+    buf := [11]byte{}
+    pos := len(buf)
+    i := int64(n)
+    signed := i < 0
+    if signed {
+        i = -i
+    }
+    for {
+        pos--
+        buf[pos], i = '0'+byte(i%10), i/10
+        if i == 0 {
+            if signed {
+                pos--
+                buf[pos] = '-'
+            }
+            return string(buf[pos:])
+        }
+    }
 }
 
 /**

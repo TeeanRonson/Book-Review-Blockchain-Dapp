@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p1"
 	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p2"
+	"github.com/teeanronson/cs686-blockchain-p3-TeeanRonson/p5/FrontEnd"
 	"reflect"
+	"strings"
 	"sync"
 )
 
@@ -172,9 +174,18 @@ func(sbc *SyncBlockChain) Canonical() string {
 }
 
 
-/**
-Return all the book reviews in every block of the block chain as a Json
- */
 func (sbc *SyncBlockChain) GetAllReviews() string {
-	return "These are all the book reviews"
+
+	var builder strings.Builder
+
+	builder.WriteString(FrontEnd.Header())
+	builder.WriteString(FrontEnd.BookReviewsHead())
+	builder.WriteString(sbc.GetAllReviewsHelper())
+	builder.WriteString(FrontEnd.BookReviewsFoot())
+	builder.WriteString(FrontEnd.Footer())
+	builder.WriteString(FrontEnd.End())
+
+	return builder.String()
 }
+
+

@@ -72,8 +72,8 @@ Check proof of work
  */
 func CheckProofOfWork(value string) bool {
 
-    expected := "000000"
-    if reflect.DeepEqual(value[:6], expected) {
+    expected := "00000"
+    if reflect.DeepEqual(value[:5], expected) {
         return true
     }
     return false

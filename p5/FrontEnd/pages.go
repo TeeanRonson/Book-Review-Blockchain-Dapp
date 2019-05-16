@@ -2,24 +2,25 @@ package FrontEnd
 
 import "os"
 
-//var bookReviewsHead =  "<h2>Reviews</h2>\n" +
-//    "\n" +
-//    "<table>\n" +
-//    "<tr>\n" +
-//    "<th></th>\n" +
-//    "<th>Review</th>\n" +
-//    "</tr>\n"
-//
-//var bookReviewsFoot = "</table> \n"
+func BookReviewsHead() string {
+    var bookReviewsHead =  "<h2>All Book Reviews</h2>\n" +
+        "<form action=\"/newBookReview\" method=\"get\">" +
+        "<input type=\"Submit\" value=\"NewBookReview\" />" +
+        "</form>" +
+        "\n" +
+        "<table>\n" +
+        "<tr>\n" +
+        "<th>Title</th>\n" +
+        "<th>Review</th>\n" +
+        "</tr>\n"
+   return bookReviewsHead
+}
 
+func BookReviewsFoot() string {
+    var bookReviewsFoot = "</table>\n"
 
-//func BookReviewsHead() string {
-//    return bookReviewsHead
-//}
-//
-//func BookReviewsFoot() string {
-//    return bookReviewsFoot
-//}
+    return bookReviewsFoot
+}
 
 
 /**
@@ -35,7 +36,10 @@ func CreateBookReview() string {
         "Public Key:<br/>\n" + "<input type=\"text\" name=\"pubKey\" value=\"" + os.Args[1] + "\"/>\n" + "<br/>\n" +
         "Private Key:<br/>\n" + "<input type=\"text\" name=\"priKey\"/>\n" + "<br/>\n" +
         "<input type=\"submit\" value=\"Submit\"/>\n" +
-        "</form>\n"
+        "</form>\n" +
+        "<form action=\"/getAllBookReviews\" method=\"get\">" +
+        "<input type=\"Submit\" value=\"AllBookReviews\" />" +
+        "</form>"
     return newBookReview
 }
 
