@@ -41,7 +41,7 @@ Miner Nodes do not have interfaces, however, we are able to check the number of 
  - Client sends a) Signature b) ReviewDataJson, to all Miners in its Peerlist.
 4. Miners workflow:
  - Miner Node receive the new ReviewDataJson and Signature.
- - Miner Node verifies that Hash(ReviewData) == Signature, since the ReviewData was created with the Sender's private key, we have authenticity.
+ - Miner Node verifies that Hash(ReviewData) == Signature, since the ReviewData was created with the Sender's private key
  - Miner Node adds the ReviewData into their transaction pool queue. 
  - Concurrently, if the transaction pool is not empty, Miners poll new ReviewData from the transaction pool to be added into their block.
 5. Miners attempt to solve the ProofOfWork required to earn the transaction fees. 
@@ -124,6 +124,10 @@ Response: text/html
  - [x] Workflow for Miner transactions 
  - [x] Workflow for Book Database
  - [x] Local Transaction pool 
+ 
+## Future work and improvements 
+- [ ] Implement RSA public & private key pair for each Node, ensures Integrity of data
+
 
 ## Disclaimer & Assumptions
 This project is an academic level abstract of an actual decentralized application on the public blockchain. 
