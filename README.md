@@ -21,52 +21,54 @@ Blockchain technology allows us to satisfy both authenticity and integrity of bo
 
 We can achieve these two features using public-private key cryptology on the blockchain platform, coupled with blockchain technology we can ensure immutability via our proof of work mechanism.
 
+## Overview 
+The application separates miner nodes from client nodes and each have overlapping and distinct functionalities of their own. 
+#### Client Nodes
+Client Nodes have user interfaces which allow clients to post new book reviews, check the book reviews on the platform, and check all the books that are in the client library. Client nodes receive input from users and sends the reviews onto Miners to be added into the blockchain. 
+#### Miner Nodes
+Miner Nodes do not have interfaces, however, we are able to check the number of transactions that a miner has processed and the total transaction fees accumulated over each block produced. Miners receive new reviews (transactions) from Client Nodes and stores them into a local transaction pool. When transaction pools are not empty, they add new transactions into their block and attempt to solve the block with ProofOfWork. 
+
+
+
 ## Workflow 
 #### Lifecycle of a new book review 
-1. New clients create a new public and private key pair.
-2. New clients register with the platform by providing their public keys.
-3. Client Workflow:
- - Client checks if the book title already exists and adds a bookId to the new reviewObject
- - Client encrypts the ReviewObject with its private key
- - Client sends a) EncryptedReviewObject b) ReviewObject
- - Client sends a) & b) to each address of its Peerlist
+1. New users use their address as their public key, and usernames as their private key.
+2. Client Node Workflow:
+ - User submits a new book review 
+ - Client Node adds a bookId to the new book review by checking a local book database - this is shared with all other Client nodes via HeartBeats.
+ - Client Node creates a stamp using the private key (username) of the user, and adds it into the new ReviewData.
+ - Client Node then hashes the new ReviewData - Hash(ReviewData) to obtain a Signature.
+ - Client sends a) Signature b) ReviewDataJson, to all Miners in its Peerlist.
 4. Miners workflow:
- - Verify the new ReviewObjects by ensuring the decrypt(EncryptedReviewObject) == ReviewObject
- - Propagate ReviewObject to peerlist
- - Add ReviewObject into their transaction pool queue 
- - Miners pull a ReviewObject from the transaction pool to be added into their block
-5. Miners attempt to solve the ProofOfWork required to earn the BlockReward and transaction fees associated with the ReviewObjects. 
-6. They broadcast the solved block to the peerlist of peer nodes. 
-7. Each miner checks the ReviewObject of the solved block against their existing transaction pool and removes it from their pool
-8. Repeat from step 4.
+ - Miner Node receive the new ReviewDataJson and Signature.
+ - Miner Node verifies that Hash(ReviewData) == Signature, since the ReviewData was created with the Sender's private key, we have authenticity.
+ - Miner Node adds the ReviewData into their transaction pool queue. 
+ - Concurrently, if the transaction pool is not empty, Miners poll new ReviewData from the transaction pool to be added into their block.
+5. Miners attempt to solve the ProofOfWork required to earn the transaction fees. 
+6. If they solve ProofOfWork, they broadcast the solved block to the peerlist of peer nodes. Else, they chase the next block.
+7. Miner Node adds the transaction fees into its wallet. 
 
 ## What are the list of functionalities?
-
+### Client Node
 #### Allows a client to retrieve all book reviews that exist on the Book Review Application
 ```
-GET /allBookReviews
+GET /getAllBookReviews
 Response: text/html
 ```
 
-#### Allows a client to generate a new public private key pair
+#### Gets the book review page
 ```
-GET /privatePublicKeyPair
-
-Response: 
-{
-"public": string,
-"private": string,
-}
+GET /newBookReview
+Response: text/html
 ```
 
-#### Takes the client to the page where a new book review can be created 
+#### Gets all the books in the local book database
 ```
-GET /createBookReview
+GET /getAllBooks
 Response: text/html
 ```
 
 #### Allows a client to post a new book review onto the Book Review Application
-##### Implementation details
 ```
 POST /newBookReview
 Content-type: application/json
@@ -75,26 +77,37 @@ Struct bookReviewWithId
 {"title": string,
 "reviewText": string,
 "reviewRating": int,
-"transactionFee": float,
-"publicKey": string,
-"signature": string,
-"bookId": int,
+"txFee": float,
+"pubKey": string,
+"priKey": string,
 }
 ```
+### Miner Node
+#### Shows the all transaction fees obtained and total accumulated fees
+```
+GET /showWallet
+Response: text/html
+```
 
-- MPT: key = bookTitle; value = bookReview JSON element 
+#### Miner Node receives the incoming ReviewData from sent from the Client Nodes
+```
+POST /reviewObjectReceive
+Response: text/html
+```
+
+
+- MPT: key = bookTitle; value = bookReview JSON
  
 - title: User generated content
 - reviewText: User generated content
 - reviewRating: User generated content <Value from 0-5>
 - transactionFee: User generated content
-- publicKey: Sender public key
-- signature: privateKey(BookReview)
-- bookId: bookId
+- pubKey: Sender Address
+- priKey: Sender Username
 
 ## Define the success of this product?
- - [ ] Users will be able to post new reviews to the application 
- - [ ] Users will be able to view all reviewed books on the platform
+ - [x] Users will be able to post new reviews to the application 
+ - [x] Users will be able to view all reviewed books on the platform
 
 ## Midpoint Task List
  - [x] Set up new data structures 
@@ -103,16 +116,19 @@ Struct bookReviewWithId
  - [x] GET createBookReview endpoint
 
 ## Final Deadline Task List & Milestones
- - [ ] NewBookReview FrontEnd 
- - [ ] AllBookReviews FrontEnd
- - [ ] Public Private Key generation for clients
- - [ ] Workflow logic for POST /newBookReview
- - [ ] Workflow logic for GET /allBookReviews
- - [ ] Workflow logic for GET /createBookReview
+ - [x] NewBookReview FrontEnd 
+ - [x] AllBookReviews FrontEnd
+ - [x] Workflow logic for POST /newBookReview
+ - [x] Workflow logic for GET /allBookReviews
+ - [x] Workflow logic for GET /newBookReview
+ - [x] Workflow for Miner transactions 
+ - [x] Workflow for Book Database
+ - [x] Local Transaction pool 
 
 ## Disclaimer & Assumptions
 This project is an academic level abstract of an actual decentralized application on the public blockchain. 
 The implementation of the underlying blockchain is simplified to fit the nature of this project, and several assumptions have been made about transactions to allow the project to work seamlessly. 
 
-1. Client that posts a new book review owns sufficient transaction fees 
+1. Client that posts a new book review owns sufficient transaction fees and/or application currency
 2. New book review is assumed to be a valid book
+3. Client Nodes have all been signed up to the platform and have obtained a unique private username
