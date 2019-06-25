@@ -29,6 +29,9 @@ func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString m
 
 	fmt.Println("2a. We created HeartBeat!")
 	fmt.Println("2b. We created HeartBeat!")
+	fmt.Println("2c. We created HeartBeat!")
+	fmt.Println("2d. We created HeartBeat!")
+
 	return HeartBeatData{false, selfId, ""	, peerMapJsonString, bookDatabase, addr, 3}
 }
 
