@@ -107,8 +107,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/p3/data/heartbeat.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="32" column="19" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
+            <state relative-caret-position="438">
+              <caret line="28" column="4" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -210,27 +210,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane" />
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="cs686-blockchain-p3-TeeanRonson" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cs686-blockchain-p3-TeeanRonson" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cs686-blockchain-p3-TeeanRonson" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cs686-blockchain-p3-TeeanRonson" type="462c0819:PsiDirectoryNode" />
-              <item name="p3" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cs686-blockchain-p3-TeeanRonson" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -363,10 +344,10 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="1027" extended-state="6" />
+    <frame x="0" y="23" width="1680" height="1027" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16564792" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16748166" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -738,8 +719,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/p3/data/heartbeat.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="32" column="19" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
+        <state relative-caret-position="438">
+          <caret line="28" column="4" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
         </state>
       </provider>
     </entry>

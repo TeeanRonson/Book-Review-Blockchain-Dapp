@@ -26,11 +26,7 @@ if yes, do:
 (3) Create a HeartBeatData, add that new block, and return.
 */
 func PrepareHeartBeatData(sbc *SyncBlockChain, selfId int32, peerMapJsonString map[string]int32, bookDatabase map[string]int32, addr string) HeartBeatData {
-
-	fmt.Println("2a. We created HeartBeat!")
-	fmt.Println("2b. We created HeartBeat!")
-	fmt.Println("2c. We created HeartBeat!")
-	fmt.Println("2d. We created HeartBeat!")
+	fmt.Println("There is room for improvements!")
 
 	return HeartBeatData{false, selfId, ""	, peerMapJsonString, bookDatabase, addr, 3}
 }
